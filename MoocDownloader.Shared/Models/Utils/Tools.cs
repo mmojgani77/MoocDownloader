@@ -23,7 +23,8 @@ namespace MoocDownloader.Shared.Base
                     Title = attr.Title,
                     WebsiteUrl = attr.WebsiteUrl,
                     CrawlerType = x,
-                    Index = attr.Index
+                    Index = attr.Index,
+                    Implemented = attr.Implemented
                 };
             });
         }

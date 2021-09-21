@@ -60,6 +60,7 @@ namespace MoocDownloader.WinForm
             this.comboCrawlers.Name = "comboCrawlers";
             this.comboCrawlers.Size = new System.Drawing.Size(374, 28);
             this.comboCrawlers.TabIndex = 0;
+            this.comboCrawlers.SelectedIndexChanged += new System.EventHandler(this.comboCrawlers_SelectedIndexChanged);
             // 
             // label1
             // 
@@ -227,6 +228,7 @@ namespace MoocDownloader.WinForm
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Mooc Downloader";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.gpPageLimits.ResumeLayout(false);
             this.gpPageLimits.PerformLayout();

@@ -10,7 +10,7 @@ using System.Threading;
 
 namespace MoocDownloader.Shared.Models.WebsiteCrawlers
 {
-    [CrawlerInfo("Go to class", "https://gotoclass.ir")]
+    [CrawlerInfo("Go to class", "https://gotoclass.ir", indexNumber: 1)]
     public class GotoClassCrawler : CrawlerBase
     {
         private const string Url = "https://dars.gotoclass.ir/login";
@@ -86,7 +86,7 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
                 var src = videoSource?.GetAttribute("src");
                 if (string.IsNullOrWhiteSpace(src))
                     return null;
-                var orgSrc = src.Substring(0,src.LastIndexOf('?'));
+                var orgSrc = src.Substring(0, src.LastIndexOf('?'));
                 return orgSrc;
             }
             catch

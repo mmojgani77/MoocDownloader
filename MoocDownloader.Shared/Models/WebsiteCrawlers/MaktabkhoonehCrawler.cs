@@ -11,7 +11,7 @@ using System.Threading;
 
 namespace MoocDownloader.Shared.Models
 {
-    [CrawlerInfo("Maktabkhooneh", "https://maktabkhooneh.org")]
+    [CrawlerInfo("Maktabkhooneh", "https://maktabkhooneh.org", indexNumber: 0)]
     public class MaktabkhoonehCrawler : CrawlerBase
     {
         private const string MaktabkhoonehUrl = "https://maktabkhooneh.com";

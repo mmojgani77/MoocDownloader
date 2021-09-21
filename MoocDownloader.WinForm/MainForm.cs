@@ -14,6 +14,7 @@ using MoocDownloader.Shared.Base;
 using MoocDownloader.Shared.Models.DataTransferObjects;
 using System.Threading;
 using System.IO;
+using MoocDownloader.WinForm.Assets;
 
 namespace MoocDownloader.WinForm
 {
@@ -30,13 +31,24 @@ namespace MoocDownloader.WinForm
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            usernameBox.Text = Settings.Default.Username;
+            passwordBox.Text = Settings.Default.Password;
             LoadAllCrawlers(comboCrawlers);
         }
 
         private void LoadAllCrawlers(ComboBox combo)
         {
             _crawlersInfo = Tools.GetCrawlers().OrderBy(x => x.Index).ToList();
-            combo.Items.AddRange(_crawlersInfo.Select(x => x.Title).ToArray());
+
+            combo.Items.AddRange(_crawlersInfo.Select(x =>
+            {
+                string title = x.Title;
+                if (!x.Implemented)
+                    title += " (*Not implemented)";
+                return title;
+
+            }).ToArray());
+
             combo.SelectedIndex = 0;
         }
 
@@ -73,7 +85,10 @@ namespace MoocDownloader.WinForm
         private async void btnCrawl_Click(object sender, EventArgs e)
         {
             if (!_started)
-                await StartCrawl();
+            {
+                if (IsCrawlerImplemented())
+                    await StartCrawl();
+            }
             else
                 Stop();
         }
@@ -111,7 +126,6 @@ namespace MoocDownloader.WinForm
                     {
                         await Task.Run(() =>
                         {
-
                             links = service.StartToCrawl(Progress, courseLink, fromPage, toPage, _cancellationTokenSource.Token);
                         });
                     }
@@ -124,7 +138,7 @@ namespace MoocDownloader.WinForm
             }
             catch
             {
-                MessageBox.Show("There is a problem in crawling.\nPlease contact the programmer");
+                MessageBox.Show("There is a problem in crawling.\nPlease contact the programmer (mmojgani77@gmail.com)");
             }
             _started = false;
             btnCrawl.Text = "Start to crawl links";
@@ -139,6 +153,28 @@ namespace MoocDownloader.WinForm
             var index = comboCrawlers.SelectedIndex;
             var crawlerInfo = _crawlersInfo[index];
             return (CrawlerBase)Activator.CreateInstance(crawlerInfo.CrawlerType, new object[] { username, password });
+        }
+
+        private void comboCrawlers_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            IsCrawlerImplemented();
+        }
+
+        private bool IsCrawlerImplemented()
+        {
+            var crawler = _crawlersInfo[comboCrawlers.SelectedIndex];
+            if (!crawler.Implemented)
+            {
+                MessageBox.Show($"You can't use {crawler.Title} crawler.\nBecause it is not implemented yet.", "Not implemented error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            return crawler.Implemented;
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Settings.Default.Username = usernameBox.Text;
+            Settings.Default.Password = passwordBox.Text;
+            Settings.Default.Save();
         }
     }
 }

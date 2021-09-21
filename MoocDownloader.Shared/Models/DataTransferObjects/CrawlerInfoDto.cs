@@ -10,5 +10,6 @@ namespace MoocDownloader.Shared.Models.DataTransferObjects
         public string Title { get; set; }
         public string WebsiteUrl { get; set; }
         public Type CrawlerType { get; set; }
+        public bool Implemented { get; set; }
     }
 }
