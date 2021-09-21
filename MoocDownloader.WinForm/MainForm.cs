@@ -131,7 +131,6 @@ namespace MoocDownloader.WinForm
                     }
 
                     File.WriteAllLines(saveFileDialog.FileName, links.ToArray());
-                    ApplyControlsEnableStatus(true);
                     MessageBox.Show($"Done.\n{links.Count} videos crawled", "done", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 saveFileDialog = null;
@@ -140,6 +139,7 @@ namespace MoocDownloader.WinForm
             {
                 MessageBox.Show("There is a problem in crawling.\nPlease contact the programmer (mmojgani77@gmail.com)");
             }
+            ApplyControlsEnableStatus(true);
             _started = false;
             btnCrawl.Text = "Start to crawl links";
         }
