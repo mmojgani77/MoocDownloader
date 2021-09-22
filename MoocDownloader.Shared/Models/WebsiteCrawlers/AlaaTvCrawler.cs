@@ -19,53 +19,19 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
         {
 
         }
-        protected override Queue<string> CrawlVideoUrls(Action<ProgressValue> progress, string coursePageLink, int? fromPage = null, int? toPage = null, CancellationToken stoppingToken = default)
+
+        protected override bool Login()
         {
-            var pagesToCrawlQueue = GetCoursePagesQueue(coursePageLink);
-            var videoUrls = new Queue<string>();
-            int page = 1;
-            int totalCount = pagesToCrawlQueue.Count;
-
-            if (toPage.HasValue && fromPage.HasValue)
-                totalCount = toPage.GetValueOrDefault() - fromPage.GetValueOrDefault() + 1;
-            else if (toPage.HasValue)
-                totalCount = toPage.GetValueOrDefault();
-            else if (fromPage.HasValue)
-                totalCount -= fromPage.GetValueOrDefault() - 1;
-
-            int crawledCount = 0;
-            while (pagesToCrawlQueue.TryDequeue(out string pageLink) && !stoppingToken.IsCancellationRequested)
-            {
-                if (fromPage.HasValue && page < fromPage)
-                {
-                    page++;
-                    continue;
-                }
-
-                if (toPage.HasValue && page > toPage)
-                {
-                    break;
-                }
-
-                var videoLink = GetVideoUrlOfPage(pageLink);
-                if (!string.IsNullOrWhiteSpace(videoLink))
-                    videoUrls.Enqueue(videoLink);
-                crawledCount++;
-                progress?.Invoke(new ProgressValue { Value = crawledCount, TotalCount = totalCount });
-                page++;
-            }
-            return videoUrls;
+            return true;
         }
 
-        private Queue<string> GetCoursePagesQueue(string coursePageLink)
+        protected override Queue<string> ExtractAllCoursePagesFromCourseListPage()
         {
-            Navigator.GoToUrl(coursePageLink);
             ScrollToEndOfPage();
             var pages = Chrome.FindElementsByCssSelector(".a--list1-title a");
             var pagesQueue = new Queue<string>(pages.Select(x => x.GetAttribute("href")));
             return pagesQueue;
         }
-
         private void ScrollToEndOfPage()
         {
             string oldScy, newScy;
@@ -79,24 +45,23 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
             while (oldScy != newScy);
         }
 
-        private string GetVideoUrlOfPage(string pageLink)
+        protected override List<string> ExtractEachCoursePageVideoUrls()
         {
+            var result = new List<string>();
             try
             {
-                Navigator.GoToUrl(pageLink);
                 var videoSource = Chrome.FindElementsByCssSelector("source").FirstOrDefault();
-                return videoSource?.GetAttribute("src");
+                var src = videoSource?.GetAttribute("src");
+                if (!string.IsNullOrWhiteSpace(src))
+                {
+                    result.Add(src);
+                }
             }
             catch
             {
 
             }
-            return null;
-        }
-
-        protected override void Login()
-        {
-            IsLogin = true;
+            return result;
         }
     }
 }

@@ -16,12 +16,18 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
         {
 
         }
-        protected override Queue<string> CrawlVideoUrls(Action<ProgressValue> progress, string coursePageLink, int? fromPage = null, int? toPage = null, CancellationToken stoppingToken = default)
+
+        protected override Queue<string> ExtractAllCoursePagesFromCourseListPage()
         {
             throw new NotImplementedException();
         }
 
-        protected override void Login()
+        protected override List<string> ExtractEachCoursePageVideoUrls()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override bool Login()
         {
             throw new NotImplementedException();
         }

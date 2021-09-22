@@ -1,5 +1,6 @@
 ﻿using MoocDownloader.Shared.Models.Base;
 using MoocDownloader.Shared.Models.Base.Attributes;
+using MoocDownloader.Shared.Models.DataTransferObjects;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
@@ -11,7 +12,7 @@ using System.Threading;
 
 namespace MoocDownloader.Shared.Models
 {
-    [CrawlerInfo("Maktabkhooneh", "https://maktabkhooneh.org", indexNumber: 0, authenticationRequired: true,courseLinkFormat: @"^http(s)?:\/\/(www.)?maktabkhooneh\.org\/course\/.*$")]
+    [CrawlerInfo("Maktabkhooneh", "https://maktabkhooneh.org", indexNumber: 0, authenticationRequired: true, courseLinkFormat: @"^http(s)?:\/\/(www.)?maktabkhooneh\.org\/course\/.*$")]
     public class MaktabkhoonehCrawler : CrawlerBase
     {
         private const string MaktabkhoonehUrl = "https://maktabkhooneh.com";
@@ -19,84 +20,54 @@ namespace MoocDownloader.Shared.Models
         {
 
         }
-        protected sealed override void Login()
+
+        protected sealed override bool Login()
         {
-            if (IsLogin)
-                return;
-
-            var loginButton = Chrome.FindElementByCssSelector("button[type=submit]");
-            loginButton.Click();
-            var usernameInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("input[name=tessera]")));
-            usernameInput.SendKeys(Username);
-            var submitButton = Chrome.FindElementByCssSelector(".filler.js-check-active-user-form input[type=submit]");
-            submitButton.Click();
-            var passwordInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("input[name=password]")));
-            passwordInput.SendKeys(Password);
-            submitButton = Chrome.FindElementByCssSelector(".filler.js-login-authentication-nv-form input[type=submit]");
-            submitButton.Click();
-            Waiter.Until(ExpectedConditions.ElementExists(By.CssSelector(".navbar__signin a[href*=dashboard]")));
-            IsLogin = true;
-        }
-
-        protected sealed override Queue<string> CrawlVideoUrls(Action<ProgressValue> progress, string coursePageLink, int? fromPage, int? toPage, CancellationToken stoppingToken = default)
-        {
-            var pagesToCrawlQueue = GetCoursePagesQueue(coursePageLink);
-            var videoUrls = new Queue<string>();
-            int page = 1;
-            int totalCount = pagesToCrawlQueue.Count;
-
-            if (toPage.HasValue && fromPage.HasValue)
-                totalCount = toPage.GetValueOrDefault() - fromPage.GetValueOrDefault() + 1;
-            else if (toPage.HasValue)
-                totalCount = toPage.GetValueOrDefault();
-            else if (fromPage.HasValue)
-                totalCount -= fromPage.GetValueOrDefault() - 1;
-
-            int crawledCount = 0;
-            while (pagesToCrawlQueue.TryDequeue(out string pageLink) && !stoppingToken.IsCancellationRequested)
+            try
             {
-                if (fromPage.HasValue && page < fromPage)
-                {
-                    page++;
-                    continue;
-                }
-
-                if (toPage.HasValue && page > toPage)
-                {
-                    break;
-                }
-
-                var videoLink = GetVideoUrlOfPage(pageLink);
-                if (!string.IsNullOrWhiteSpace(videoLink))
-                    videoUrls.Enqueue(videoLink);
-                crawledCount++;
-                progress?.Invoke(new ProgressValue { Value = crawledCount, TotalCount = totalCount });
-                page++;
+                var loginButton = Chrome.FindElementByCssSelector("button[type=submit]");
+                loginButton.Click();
+                var usernameInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("input[name=tessera]")));
+                usernameInput.SendKeys(Username);
+                var submitButton = Chrome.FindElementByCssSelector(".filler.js-check-active-user-form input[type=submit]");
+                submitButton.Click();
+                var passwordInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("input[name=password]")));
+                passwordInput.SendKeys(Password);
+                submitButton = Chrome.FindElementByCssSelector(".filler.js-login-authentication-nv-form input[type=submit]");
+                submitButton.Click();
+                Waiter.Until(ExpectedConditions.ElementExists(By.CssSelector(".navbar__signin a[href*=dashboard]")));
+                return true;
             }
-            return videoUrls;
+            catch
+            {
+                return false;
+            }
         }
 
-        private Queue<string> GetCoursePagesQueue(string coursePageLink)
+        protected override Queue<string> ExtractAllCoursePagesFromCourseListPage()
         {
-            Navigator.GoToUrl(coursePageLink);
             var pages = Chrome.FindElementsByCssSelector(".chapter__unit");
             var pagesQueue = new Queue<string>(pages.Select(x => x.GetAttribute("href")));
             return pagesQueue;
         }
 
-        private string GetVideoUrlOfPage(string pageLink)
+        protected override List<string> ExtractEachCoursePageVideoUrls()
         {
+            var result = new List<string>();
             try
             {
-                Navigator.GoToUrl(pageLink);
                 var videoSource = Chrome.FindElementsByCssSelector("source").FirstOrDefault();
-                return videoSource?.GetAttribute("src");
+                var src = videoSource?.GetAttribute("src");
+                if (!string.IsNullOrWhiteSpace(src))
+                {
+                    result.Add(src);
+                }
             }
             catch
             {
 
             }
-            return null;
+            return result;
         }
     }
 }

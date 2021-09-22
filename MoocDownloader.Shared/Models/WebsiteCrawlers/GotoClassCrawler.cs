@@ -19,72 +19,37 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
 
         }
 
-
-        protected sealed override void Login()
+        protected sealed override bool Login()
         {
-            var usernameInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("input[name=email]")));
-            usernameInput.SendKeys(Username);
-            var passwordInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("input[name=password]")));
-            passwordInput.SendKeys(Password);
-            var loginButton = Chrome.FindElementByCssSelector("button[type=submit]");
-            loginButton.Click();
-            Waiter.Until(ExpectedConditions.ElementExists(By.CssSelector(".nav-item a[href*=dashboard]")));
-            IsLogin = true;
-        }
-        protected sealed override Queue<string> CrawlVideoUrls(Action<ProgressValue> progress, string coursePageLink, int? fromPage = null, int? toPage = null, CancellationToken stoppingToken = default)
-        {
-            var pagesToCrawlQueue = GetCoursePagesQueue(coursePageLink);
-            var videoUrls = new Queue<string>();
-            int page = 1;
-            int totalCount = pagesToCrawlQueue.Count;
-
-            if (toPage.HasValue && fromPage.HasValue)
-                totalCount = toPage.GetValueOrDefault() - fromPage.GetValueOrDefault() + 1;
-            else if (toPage.HasValue)
-                totalCount = toPage.GetValueOrDefault();
-            else if (fromPage.HasValue)
-                totalCount -= fromPage.GetValueOrDefault() - 1;
-
-            int crawledCount = 0;
-            while (pagesToCrawlQueue.TryDequeue(out string pageLink) && !stoppingToken.IsCancellationRequested)
+            try
             {
-                if (fromPage.HasValue && page < fromPage)
-                {
-                    page++;
-                    continue;
-                }
-
-                if (toPage.HasValue && page > toPage)
-                {
-                    break;
-                }
-
-                var videoLinks = GetVideoUrlsOfPage(pageLink);
-                foreach (var videoLink in videoLinks)
-                {
-                    videoUrls.Enqueue(videoLink);
-                }
-                crawledCount++;
-                progress?.Invoke(new ProgressValue { Value = crawledCount, TotalCount = totalCount });
-                page++;
+                var usernameInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("input[name=email]")));
+                usernameInput.SendKeys(Username);
+                var passwordInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("input[name=password]")));
+                passwordInput.SendKeys(Password);
+                var loginButton = Chrome.FindElementByCssSelector("button[type=submit]");
+                loginButton.Click();
+                Waiter.Until(ExpectedConditions.ElementExists(By.CssSelector(".nav-item a[href*=dashboard]")));
+                return true;
             }
-            return videoUrls;
+            catch
+            {
+                return false;
+            }
         }
 
-        private Queue<string> GetCoursePagesQueue(string coursePageLink)
+        protected override Queue<string> ExtractAllCoursePagesFromCourseListPage()
         {
-            Navigator.GoToUrl(coursePageLink);
             var pages = Chrome.FindElementsByCssSelector(".subsection-text");
             var pagesQueue = new Queue<string>(pages.Select(x => x.GetAttribute("href")));
             return pagesQueue;
         }
 
-        private List<string> GetVideoUrlsOfPage(string pageLink)
+        protected override List<string> ExtractEachCoursePageVideoUrls()
         {
             try
             {
                 var videoUrls = new List<string>();
-                Navigator.GoToUrl(pageLink);
                 var presentations = Chrome.FindElementsByCssSelector("li[role=presentation]").ToArray();
                 foreach (var presentation in presentations)
                 {
@@ -105,7 +70,5 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
             }
             return null;
         }
-
-
     }
 }

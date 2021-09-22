@@ -81,6 +81,9 @@ namespace MoocDownloader.WinForm
                 control.Enabled = enabled;
             }
             this.Enabled = true;
+
+            // do the combo event again to disable things if needed
+            comboCrawlers_SelectedIndexChanged(comboCrawlers, new EventArgs());
         }
 
         private async void btnCrawl_Click(object sender, EventArgs e)
@@ -135,17 +138,28 @@ namespace MoocDownloader.WinForm
                     {
                         toPage = to;
                     }
-                    Queue<string> links = new Queue<string>();
-
+                    var crawlerResult = new CrawlerResult();
+                    var links = new Queue<string>();
                     using (CrawlerBase service = CreateSelectedCrawler(comboCrawlers, username, password))
                     {
                         _currentCrawler = service;
                         await Task.Run(() =>
                         {
-                            links = service.StartToCrawl(Progress, courseLink, fromPage, toPage, _cancellationTokenSource.Token);
+                            crawlerResult = service.ExtractAllVideoUrlsOfCourse(Progress, courseLink, fromPage, toPage, _cancellationTokenSource.Token);
                         });
                     }
                     _currentCrawler = null;
+
+                    if (crawlerResult.HasError)
+                    {
+                        ShowError("There was a problem in crawling process.\nIt is that some of video urls is missing.");
+                    }
+
+                    if (crawlerResult.CrawledVideoUrls != null)
+                    {
+                        links = crawlerResult.CrawledVideoUrls;
+                    }
+
                     File.WriteAllLines(saveFileDialog.FileName, links.ToArray());
                     MessageBox.Show($"Done.\n{links.Count} videos crawled", "done", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
