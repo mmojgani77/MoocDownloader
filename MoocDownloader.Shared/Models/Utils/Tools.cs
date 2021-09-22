@@ -24,7 +24,9 @@ namespace MoocDownloader.Shared.Base
                     WebsiteUrl = attr.WebsiteUrl,
                     CrawlerType = x,
                     Index = attr.Index,
-                    Implemented = attr.Implemented
+                    Implemented = attr.Implemented,
+                    AuthenticationRequired = attr.AuthenticationRequired,
+                    CourseLinkFormat = attr.CourseLinkFormat
                 };
             });
         }

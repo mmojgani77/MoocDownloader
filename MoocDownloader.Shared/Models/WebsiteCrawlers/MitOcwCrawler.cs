@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace MoocDownloader.Shared.Models.WebsiteCrawlers
 {
-    [CrawlerInfo("Mit Open Course Ware", "https://ocw.mit.edu/", 4, implemented: false)]
+    [CrawlerInfo("Mit Open Course Ware", "https://ocw.mit.edu/", 5, implemented: false)]
     public class MitOcwCrawler : CrawlerBase
     {
         private const string Url = "https://ocw.mit.edu/";

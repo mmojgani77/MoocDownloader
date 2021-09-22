@@ -10,7 +10,7 @@ using System.Threading;
 
 namespace MoocDownloader.Shared.Models.WebsiteCrawlers
 {
-    [CrawlerInfo("Go to class", "https://gotoclass.ir", indexNumber: 1)]
+    [CrawlerInfo("Go to class", "https://gotoclass.ir", indexNumber: 1, authenticationRequired: true,courseLinkFormat: @"^http(s)?:\/\/(www.)?dars.gotoclass.ir\/courses\/.*\/course\/$")]
     public class GotoClassCrawler : CrawlerBase
     {
         private const string Url = "https://dars.gotoclass.ir/login";

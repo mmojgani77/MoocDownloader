@@ -32,8 +32,8 @@ namespace MoocDownloader.WinForm
             this.comboCrawlers = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
+            this.lblPassword = new System.Windows.Forms.Label();
+            this.lblUsername = new System.Windows.Forms.Label();
             this.courseLinkBox = new System.Windows.Forms.TextBox();
             this.passwordBox = new System.Windows.Forms.TextBox();
             this.usernameBox = new System.Windows.Forms.TextBox();
@@ -80,23 +80,23 @@ namespace MoocDownloader.WinForm
             this.label3.TabIndex = 20;
             this.label3.Text = "*Course link to crawl : ";
             // 
-            // label2
+            // lblPassword
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(19, 111);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(87, 20);
-            this.label2.TabIndex = 19;
-            this.label2.Text = "*Password : ";
+            this.lblPassword.AutoSize = true;
+            this.lblPassword.Location = new System.Drawing.Point(19, 111);
+            this.lblPassword.Name = "lblPassword";
+            this.lblPassword.Size = new System.Drawing.Size(87, 20);
+            this.lblPassword.TabIndex = 19;
+            this.lblPassword.Text = "*Password : ";
             // 
-            // label4
+            // lblUsername
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(19, 71);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(92, 20);
-            this.label4.TabIndex = 18;
-            this.label4.Text = "*Username : ";
+            this.lblUsername.AutoSize = true;
+            this.lblUsername.Location = new System.Drawing.Point(19, 71);
+            this.lblUsername.Name = "lblUsername";
+            this.lblUsername.Size = new System.Drawing.Size(92, 20);
+            this.lblUsername.TabIndex = 18;
+            this.lblUsername.Text = "*Username : ";
             // 
             // courseLinkBox
             // 
@@ -209,8 +209,8 @@ namespace MoocDownloader.WinForm
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(587, 359);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label4);
+            this.Controls.Add(this.lblPassword);
+            this.Controls.Add(this.lblUsername);
             this.Controls.Add(this.courseLinkBox);
             this.Controls.Add(this.passwordBox);
             this.Controls.Add(this.usernameBox);
@@ -242,8 +242,8 @@ namespace MoocDownloader.WinForm
         private System.Windows.Forms.ComboBox comboCrawlers;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label lblPassword;
+        private System.Windows.Forms.Label lblUsername;
         private System.Windows.Forms.TextBox courseLinkBox;
         private System.Windows.Forms.TextBox passwordBox;
         private System.Windows.Forms.TextBox usernameBox;

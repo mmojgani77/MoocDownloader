@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace MoocDownloader.Shared.Models.WebsiteCrawlers
 {
-    [CrawlerInfo("Edx", "https://edx.org/", 3, implemented: false)]
+    [CrawlerInfo("Edx", "https://edx.org/", 4, implemented: false)]
     public class EdxCrawler : CrawlerBase
     {
         private const string Url = "https://authn.edx.org/login";

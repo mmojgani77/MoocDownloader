@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace MoocDownloader.Shared.Models.DataTransferObjects
 {
@@ -11,5 +12,7 @@ namespace MoocDownloader.Shared.Models.DataTransferObjects
         public string WebsiteUrl { get; set; }
         public Type CrawlerType { get; set; }
         public bool Implemented { get; set; }
+        public bool AuthenticationRequired { get; set; }
+        public Regex CourseLinkFormat { get; set; }
     }
 }

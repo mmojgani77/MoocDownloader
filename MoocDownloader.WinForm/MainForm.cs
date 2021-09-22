@@ -87,11 +87,25 @@ namespace MoocDownloader.WinForm
         {
             if (!_started)
             {
-                if (IsCrawlerImplemented())
+                if (IsCrawlerImplemented() && HasValidModel() && IsCourseLinkInCorrectFormat())
                     await StartCrawl();
             }
             else
                 Stop();
+        }
+
+        private bool HasValidModel()
+        {
+            var crawler = GetSelectedCrawlerInfo();
+            if (crawler.AuthenticationRequired)
+            {
+                if (string.IsNullOrWhiteSpace(usernameBox.Text) || string.IsNullOrWhiteSpace(passwordBox.Text))
+                {
+                    ShowError($"Authentication data is required for {crawler.Title} crawler.\nFill the Username and Password boxes", "Authentication data required");
+                    return false;
+                }
+            }
+            return true;
         }
 
         private async Task StartCrawl()
@@ -139,7 +153,7 @@ namespace MoocDownloader.WinForm
             }
             catch
             {
-                MessageBox.Show("There is a problem in crawling.\nPlease contact the programmer (mmojgani77@gmail.com)");
+                ShowError("There is a problem in crawling.\nPlease contact the programmer (mmojgani77@gmail.com)");
             }
             ApplyControlsEnableStatus(true);
             _started = false;
@@ -152,24 +166,57 @@ namespace MoocDownloader.WinForm
 
         private CrawlerBase CreateSelectedCrawler(ComboBox comboCrawlers, string username, string password)
         {
-            var index = comboCrawlers.SelectedIndex;
-            var crawlerInfo = _crawlersInfo[index];
+            var crawlerInfo = GetSelectedCrawlerInfo();
+            if (!crawlerInfo.AuthenticationRequired)
+            {
+                username = "";
+                password = "";
+            }
             return (CrawlerBase)Activator.CreateInstance(crawlerInfo.CrawlerType, new object[] { username, password });
         }
 
         private void comboCrawlers_SelectedIndexChanged(object sender, EventArgs e)
         {
-            IsCrawlerImplemented();
+            var crawler = GetSelectedCrawlerInfo();
+            btnCrawl.Enabled = IsCrawlerImplemented();
+            string prefix = crawler.AuthenticationRequired ? "*" : "";
+            lblUsername.Text = $"{prefix}Username :";
+            lblPassword.Text = $"{prefix}Password :";
+            lblUsername.Enabled = lblPassword.Enabled = usernameBox.Enabled = passwordBox.Enabled = crawler.AuthenticationRequired;
         }
 
         private bool IsCrawlerImplemented()
         {
-            var crawler = _crawlersInfo[comboCrawlers.SelectedIndex];
+            var crawler = GetSelectedCrawlerInfo();
             if (!crawler.Implemented)
             {
-                MessageBox.Show($"You can't use {crawler.Title} crawler.\nBecause it is not implemented yet.", "Not implemented error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowError($"You can't use {crawler.Title} crawler.\nBecause it is not implemented yet.", "Not implemented error");
             }
             return crawler.Implemented;
+        }
+        private bool IsCourseLinkInCorrectFormat()
+        {
+            var courseLink = courseLinkBox.Text;
+            if (string.IsNullOrWhiteSpace(courseLink))
+            {
+                ShowError("You should fill the course link box");
+                return false;
+            }
+            var crawler = GetSelectedCrawlerInfo();
+            if (crawler.CourseLinkFormat != null)
+            {
+                if (!crawler.CourseLinkFormat.IsMatch(courseLink))
+                {
+                    ShowError("Course link format for this crawler (website) is not correct.\nYou should provider main page url of course list.");
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private void ShowError(string message, string title = "")
+        {
+            MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -178,6 +225,12 @@ namespace MoocDownloader.WinForm
             Settings.Default.Password = passwordBox.Text;
             Settings.Default.Save();
             _currentCrawler?.Dispose();
+        }
+
+        private CrawlerInfoDto GetSelectedCrawlerInfo()
+        {
+            var index = comboCrawlers.SelectedIndex;
+            return _crawlersInfo[index];
         }
     }
 }

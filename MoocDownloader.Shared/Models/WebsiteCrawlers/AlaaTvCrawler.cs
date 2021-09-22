@@ -1,44 +1,25 @@
 ﻿using MoocDownloader.Shared.Models.Base;
 using MoocDownloader.Shared.Models.Base.Attributes;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
-namespace MoocDownloader.Shared.Models
+namespace MoocDownloader.Shared.Models.WebsiteCrawlers
 {
-    [CrawlerInfo("Maktabkhooneh", "https://maktabkhooneh.org", indexNumber: 0, authenticationRequired: true,courseLinkFormat: @"^http(s)?:\/\/(www.)?maktabkhooneh\.org\/course\/.*$")]
-    public class MaktabkhoonehCrawler : CrawlerBase
+    [CrawlerInfo("Alaa tv", "https://alaatv.com/", indexNumber: 3, authenticationRequired: false, courseLinkFormat: "^http(s)?:\\/\\/(www.)?alaatv.com\\/set\\/\\d*$")]
+    public class AlaaTvCrawler : CrawlerBase
     {
-        private const string MaktabkhoonehUrl = "https://maktabkhooneh.com";
-        public MaktabkhoonehCrawler(string username, string password) : base(MaktabkhoonehUrl, username, password)
+        private const string Url = "https://alaatv.com/";
+        public AlaaTvCrawler(string username, string password) : base(Url, username, password)
         {
 
         }
-        protected sealed override void Login()
-        {
-            if (IsLogin)
-                return;
-
-            var loginButton = Chrome.FindElementByCssSelector("button[type=submit]");
-            loginButton.Click();
-            var usernameInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("input[name=tessera]")));
-            usernameInput.SendKeys(Username);
-            var submitButton = Chrome.FindElementByCssSelector(".filler.js-check-active-user-form input[type=submit]");
-            submitButton.Click();
-            var passwordInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("input[name=password]")));
-            passwordInput.SendKeys(Password);
-            submitButton = Chrome.FindElementByCssSelector(".filler.js-login-authentication-nv-form input[type=submit]");
-            submitButton.Click();
-            Waiter.Until(ExpectedConditions.ElementExists(By.CssSelector(".navbar__signin a[href*=dashboard]")));
-            IsLogin = true;
-        }
-
-        protected sealed override Queue<string> CrawlVideoUrls(Action<ProgressValue> progress, string coursePageLink, int? fromPage, int? toPage, CancellationToken stoppingToken = default)
+        protected override Queue<string> CrawlVideoUrls(Action<ProgressValue> progress, string coursePageLink, int? fromPage = null, int? toPage = null, CancellationToken stoppingToken = default)
         {
             var pagesToCrawlQueue = GetCoursePagesQueue(coursePageLink);
             var videoUrls = new Queue<string>();
@@ -79,9 +60,23 @@ namespace MoocDownloader.Shared.Models
         private Queue<string> GetCoursePagesQueue(string coursePageLink)
         {
             Navigator.GoToUrl(coursePageLink);
-            var pages = Chrome.FindElementsByCssSelector(".chapter__unit");
+            ScrollToEndOfPage();
+            var pages = Chrome.FindElementsByCssSelector(".a--list1-title a");
             var pagesQueue = new Queue<string>(pages.Select(x => x.GetAttribute("href")));
             return pagesQueue;
+        }
+
+        private void ScrollToEndOfPage()
+        {
+            string oldScy, newScy;
+            do
+            {
+                oldScy = Chrome.ExecuteScript("return window.scrollY;").ToString();
+                Chrome.ExecuteScript("window.scroll(0, document.body.scrollHeight);");
+                Task.Delay(10).Wait();
+                newScy = Chrome.ExecuteScript("return window.scrollY;").ToString();
+            }
+            while (oldScy != newScy);
         }
 
         private string GetVideoUrlOfPage(string pageLink)
@@ -97,6 +92,11 @@ namespace MoocDownloader.Shared.Models
 
             }
             return null;
+        }
+
+        protected override void Login()
+        {
+            IsLogin = true;
         }
     }
 }
