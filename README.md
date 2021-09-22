@@ -8,4 +8,4 @@ Things to do :
 - [ ] Implement MIT OpenCourseWare crawler [https://ocw.mit.edu/](https://ocw.mit.edu/)
 - [ ] Implement Edx crawler [https://www.edx.org/](https://www.edx.org/)
 - [ ] Implemet SSO feature for sign in
-- [ ] Add ability to crawl all links (not only videos) and save then in different text files depending on the file types (like html.txt, pdf.txt and ...)
+- [ ] Add ability to crawl all links (not only videos) and save them in different text files depending on the file types (like html.txt, pdf.txt and ...)
