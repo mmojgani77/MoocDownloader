@@ -22,6 +22,7 @@ namespace MoocDownloader.WinForm
     {
         private List<CrawlerInfoDto> _crawlersInfo;
         private CancellationTokenSource _cancellationTokenSource;
+        private CrawlerBase _currentCrawler = null;
         private bool _started;
         public MainForm()
         {
@@ -124,12 +125,13 @@ namespace MoocDownloader.WinForm
 
                     using (CrawlerBase service = CreateSelectedCrawler(comboCrawlers, username, password))
                     {
+                        _currentCrawler = service;
                         await Task.Run(() =>
                         {
                             links = service.StartToCrawl(Progress, courseLink, fromPage, toPage, _cancellationTokenSource.Token);
                         });
                     }
-
+                    _currentCrawler = null;
                     File.WriteAllLines(saveFileDialog.FileName, links.ToArray());
                     MessageBox.Show($"Done.\n{links.Count} videos crawled", "done", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -175,6 +177,7 @@ namespace MoocDownloader.WinForm
             Settings.Default.Username = usernameBox.Text;
             Settings.Default.Password = passwordBox.Text;
             Settings.Default.Save();
+            _currentCrawler?.Dispose();
         }
     }
 }

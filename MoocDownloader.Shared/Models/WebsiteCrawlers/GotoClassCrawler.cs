@@ -59,9 +59,11 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
                     break;
                 }
 
-                var videoLink = GetVideoUrlOfPage(pageLink);
-                if (!string.IsNullOrWhiteSpace(videoLink))
+                var videoLinks = GetVideoUrlsOfPage(pageLink);
+                foreach (var videoLink in videoLinks)
+                {
                     videoUrls.Enqueue(videoLink);
+                }
                 crawledCount++;
                 progress?.Invoke(new ProgressValue { Value = crawledCount, TotalCount = totalCount });
                 page++;
@@ -77,17 +79,25 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
             return pagesQueue;
         }
 
-        private string GetVideoUrlOfPage(string pageLink)
+        private List<string> GetVideoUrlsOfPage(string pageLink)
         {
             try
             {
+                var videoUrls = new List<string>();
                 Navigator.GoToUrl(pageLink);
-                var videoSource = Chrome.FindElementsByCssSelector("video source[src*=mp4]").FirstOrDefault();
-                var src = videoSource?.GetAttribute("src");
-                if (string.IsNullOrWhiteSpace(src))
-                    return null;
-                var orgSrc = src.Substring(0, src.LastIndexOf('?'));
-                return orgSrc;
+                var presentations = Chrome.FindElementsByCssSelector("li[role=presentation]").ToArray();
+                foreach (var presentation in presentations)
+                {
+                    presentation.Click();
+                    var videoSource = Chrome.FindElementsByCssSelector("video source[src*=mp4]").FirstOrDefault();
+                    var src = videoSource?.GetAttribute("src");
+                    if (!string.IsNullOrWhiteSpace(src))
+                    {
+                        var orgSrc = src.Substring(0, src.LastIndexOf('?'));
+                        videoUrls.Add(orgSrc);
+                    }
+                }
+                return videoUrls;
             }
             catch
             {
