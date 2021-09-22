@@ -1,7 +1,7 @@
 # MoocDownloader
-this application will crawl the video url of some of mooc websites
+This application will crawl the video url of some of mooc websites
 
-things to do :
+Things to do :
 
 - [x] Implement Maktabkhooneh crawler [https://maktabkhooneh.org/](https://maktabkhooneh.org/)
 - [x] Implement Alaa tv crawler [https://alaatv.com/](https://alaatv.com/)
