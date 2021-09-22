@@ -19,12 +19,14 @@ namespace MoocDownloader.Shared.Models.Base
         protected ChromeDriver Chrome { get; private set; }
         protected WebDriverWait Waiter { get; private protected set; }
         protected INavigation Navigator { get; private set; }
-        public CrawlerBase(string baseUrl, string username, string password, byte actionsTimeOutInSec = 20)
+        public CrawlerBase(string baseUrl, string username, string password, byte actionsTimeOutInSec = 30)
         {
             BaseUrl = baseUrl;
             Username = username;
             Password = password;
-            Chrome = new ChromeDriver(".");
+            var service = ChromeDriverService.CreateDefaultService();
+            service.HideCommandPromptWindow = true;
+            Chrome = new ChromeDriver(service);
             Waiter = new WebDriverWait(Chrome, TimeSpan.FromSeconds(actionsTimeOutInSec));
             Navigator = Chrome.Navigate();
         }
