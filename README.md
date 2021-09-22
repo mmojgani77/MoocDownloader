@@ -1,6 +1,5 @@
 # MoocDownloader
-This application will crawl the video url of some of mooc websites
-
+This application will crawl video urls of some of mooc websites and generates a text file. So you will be able to import it to your download manager apps
 Things to do :
 
 - [x] Implement Maktabkhooneh crawler [https://maktabkhooneh.org/](https://maktabkhooneh.org/)
