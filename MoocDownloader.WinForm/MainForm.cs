@@ -166,9 +166,9 @@ namespace MoocDownloader.WinForm
                 }
                 saveFileDialog = null;
             }
-            catch
+            catch (Exception ex)
             {
-                ShowError("There is a problem in crawling.\nPlease contact the programmer (mmojgani77@gmail.com)");
+                ShowError($"There is a problem in crawling.\nPlease contact the programmer (mmojgani77@gmail.com)\n\nMessage:{ex.Message}\n\nStackTrace{ex.StackTrace}");
             }
             ApplyControlsEnableStatus(true);
             _started = false;
