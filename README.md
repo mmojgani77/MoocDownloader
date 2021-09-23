@@ -6,6 +6,7 @@ Things to do :
 - [x] Implement Alaa tv crawler [https://alaatv.com/](https://alaatv.com/)
 - [x] Implement Go to class crawler [https://gotoclass.ir](https://gotoclass.ir)
 - [ ] Implement MIT OpenCourseWare crawler [https://ocw.mit.edu/](https://ocw.mit.edu/)
-- [ ] Implement Edx crawler [https://www.edx.org/](https://www.edx.org/)
+- [x] Implement Edx crawler [https://www.edx.org/](https://www.edx.org/)
 - [ ] Implemet SSO feature for sign in
 - [ ] Add ability to crawl all links (not only videos) and save them in different text files depending on the file types (like videos.txt, html.txt, pdf.txt and ...)
+- [ ] IDM (Internet download manager) importer tool using cli with sequential number depends on index of crawled link (like 1.mp4, 2.mp4, ...)
