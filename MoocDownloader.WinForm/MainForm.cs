@@ -83,7 +83,8 @@ namespace MoocDownloader.WinForm
             this.Enabled = true;
 
             // do the combo event again to disable things if needed
-            comboCrawlers_SelectedIndexChanged(comboCrawlers, new EventArgs());
+            if (enabled)
+                comboCrawlers_SelectedIndexChanged(comboCrawlers, new EventArgs());
         }
 
         private async void btnCrawl_Click(object sender, EventArgs e)
