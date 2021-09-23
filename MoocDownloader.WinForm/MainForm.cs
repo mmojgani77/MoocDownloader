@@ -15,14 +15,15 @@ using MoocDownloader.Shared.Models.DataTransferObjects;
 using System.Threading;
 using System.IO;
 using MoocDownloader.WinForm.Assets;
+using MoocDownloader.Shared.Models.Repository;
+using MoocDownloader.Shared.Models.Services;
 
 namespace MoocDownloader.WinForm
 {
     public partial class MainForm : Form
     {
-        private List<CrawlerInfoDto> _crawlersInfo;
+        private CrawlerService _crawlerService;
         private CancellationTokenSource _cancellationTokenSource;
-        private CrawlerBase _currentCrawler = null;
         private bool _started;
         public MainForm()
         {
@@ -39,17 +40,9 @@ namespace MoocDownloader.WinForm
 
         private void LoadAllCrawlers(ComboBox combo)
         {
-            _crawlersInfo = Tools.GetCrawlers().OrderBy(x => x.Index).ToList();
-
-            combo.Items.AddRange(_crawlersInfo.Select(x =>
-            {
-                string title = x.Title;
-                if (!x.Implemented)
-                    title += " (*Not implemented)";
-                return title;
-
-            }).ToArray());
-
+            _crawlerService = new CrawlerService();
+            var listOfTitles = _crawlerService.GetAllCrawlersTitle();
+            combo.Items.AddRange(listOfTitles);
             combo.SelectedIndex = 0;
         }
 
@@ -89,27 +82,10 @@ namespace MoocDownloader.WinForm
 
         private async void btnCrawl_Click(object sender, EventArgs e)
         {
-            if (!_started)
-            {
-                if (IsCrawlerImplemented() && HasValidModel() && IsCourseLinkInCorrectFormat())
-                    await StartCrawl();
-            }
+            if (!_started && IsCourseLinkValid())
+                await StartCrawl();
             else
                 Stop();
-        }
-
-        private bool HasValidModel()
-        {
-            var crawler = GetSelectedCrawlerInfo();
-            if (crawler.AuthenticationRequired)
-            {
-                if (string.IsNullOrWhiteSpace(usernameBox.Text) || string.IsNullOrWhiteSpace(passwordBox.Text))
-                {
-                    ShowError($"Authentication data is required for {crawler.Title} crawler.\nFill the Username and Password boxes", "Authentication data required");
-                    return false;
-                }
-            }
-            return true;
         }
 
         private async Task StartCrawl()
@@ -139,30 +115,27 @@ namespace MoocDownloader.WinForm
                     {
                         toPage = to;
                     }
-                    var crawlerResult = new CrawlerResult();
-                    var links = new Queue<string>();
-                    using (CrawlerBase service = CreateSelectedCrawler(comboCrawlers, username, password))
-                    {
-                        _currentCrawler = service;
-                        await Task.Run(() =>
-                        {
-                            crawlerResult = service.ExtractAllVideoUrlsOfCourse(Progress, courseLink, fromPage, toPage, _cancellationTokenSource.Token);
-                        });
-                    }
-                    _currentCrawler = null;
 
-                    if (crawlerResult.HasError)
+                    var response = await _crawlerService.CrawlWithCrawlerIndex(comboCrawlers.SelectedIndex, new CrawlRequestDto
                     {
-                        ShowError("There was a problem in crawling process.\nIt is that some of video urls is missing.");
-                    }
+                        CourseLink = courseLink,
+                        FromPage = fromPage,
+                        ToPage = toPage,
+                        Password = password,
+                        Username = username,
+                        Progress = Progress,
+                        StoppingToken = _cancellationTokenSource.Token
+                    });
 
-                    if (crawlerResult.CrawledVideoUrls != null)
+                    if (response.HasError || response.Result == null)
                     {
-                        links = crawlerResult.CrawledVideoUrls;
+                        ShowError(response.ErrorText);
                     }
-
-                    File.WriteAllLines(saveFileDialog.FileName, links.ToArray());
-                    MessageBox.Show($"Done.\n{links.Count} videos crawled", "done", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    else
+                    {
+                        File.WriteAllLines(saveFileDialog.FileName, response.Result.ToArray());
+                        MessageBox.Show($"Done.\n{response.Result.Count} videos crawled", "done", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                 }
                 saveFileDialog = null;
             }
@@ -176,60 +149,29 @@ namespace MoocDownloader.WinForm
         }
         private void Stop()
         {
-            _cancellationTokenSource.Cancel();
-        }
-
-        private CrawlerBase CreateSelectedCrawler(ComboBox comboCrawlers, string username, string password)
-        {
-            var crawlerInfo = GetSelectedCrawlerInfo();
-            if (!crawlerInfo.AuthenticationRequired)
-            {
-                username = "";
-                password = "";
-            }
-            return (CrawlerBase)Activator.CreateInstance(crawlerInfo.CrawlerType, new object[] { username, password });
+            _cancellationTokenSource?.Cancel();
         }
 
         private void comboCrawlers_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var crawler = GetSelectedCrawlerInfo();
-            btnCrawl.Enabled = IsCrawlerImplemented();
-            string prefix = crawler.AuthenticationRequired ? "*" : "";
+            var crawlerInfo = GetSelectedCrawlerInfo();
+            var crawlerImplemented = crawlerInfo?.Implemented ?? false;
+            var crawlerAuthenticationRequired = crawlerInfo?.AuthenticationRequired ?? false;
+
+
+            btnCrawl.Enabled = crawlerImplemented;
+            string prefix = crawlerAuthenticationRequired ? "*" : "";
             lblUsername.Text = $"{prefix}Username :";
             lblPassword.Text = $"{prefix}Password :";
-            lblUsername.Enabled = lblPassword.Enabled = usernameBox.Enabled = passwordBox.Enabled = crawler.AuthenticationRequired;
+            lblUsername.Enabled = lblPassword.Enabled = usernameBox.Enabled = passwordBox.Enabled = crawlerAuthenticationRequired;
+
+            if (!crawlerImplemented)
+            {
+                ShowError($"You can't use this crawler.\nBecause it is not implemented yet.", "Not implemented yet error");
+            }
         }
 
-        private bool IsCrawlerImplemented()
-        {
-            var crawler = GetSelectedCrawlerInfo();
-            if (!crawler.Implemented)
-            {
-                ShowError($"You can't use {crawler.Title} crawler.\nBecause it is not implemented yet.", "Not implemented error");
-            }
-            return crawler.Implemented;
-        }
-        private bool IsCourseLinkInCorrectFormat()
-        {
-            var courseLink = courseLinkBox.Text;
-            if (string.IsNullOrWhiteSpace(courseLink))
-            {
-                ShowError("You should fill the course link box");
-                return false;
-            }
-            var crawler = GetSelectedCrawlerInfo();
-            if (crawler.CourseLinkFormat != null)
-            {
-                if (!crawler.CourseLinkFormat.IsMatch(courseLink))
-                {
-                    ShowError("Course link format for this crawler (website) is not correct.\nYou should provider main page url of course list.");
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        private void ShowError(string message, string title = "")
+        private void ShowError(string message, string title = "An error occured")
         {
             MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
@@ -239,13 +181,32 @@ namespace MoocDownloader.WinForm
             Settings.Default.Username = usernameBox.Text;
             Settings.Default.Password = passwordBox.Text;
             Settings.Default.Save();
-            _currentCrawler?.Dispose();
         }
 
-        private CrawlerInfoDto GetSelectedCrawlerInfo()
+        private CrawlerInfo GetSelectedCrawlerInfo()
         {
-            var index = comboCrawlers.SelectedIndex;
-            return _crawlersInfo[index];
+            int index = comboCrawlers.SelectedIndex;
+            var crawlerInfo = _crawlerService.FindCrawlerWithIndex(index);
+            return crawlerInfo;
+        }
+
+        private bool IsCourseLinkValid()
+        {
+            var courseLink = courseLinkBox.Text;
+            if (string.IsNullOrWhiteSpace(courseLink))
+            {
+                ShowError("You should fill the course link box");
+                return false;
+            }
+
+            bool isCourseLinkValid = GetSelectedCrawlerInfo()?.IsUrlMatchToCrawler(courseLink) ?? false;
+            if (!isCourseLinkValid)
+            {
+                ShowError("Course link format for this crawler (website) is not correct.\nYou should provider main page url of course list.");
+                return false;
+            }
+
+            return isCourseLinkValid;
         }
     }
 }

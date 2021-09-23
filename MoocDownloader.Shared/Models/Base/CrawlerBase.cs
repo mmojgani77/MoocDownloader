@@ -19,7 +19,7 @@ namespace MoocDownloader.Shared.Models.Base
         protected ChromeDriver Chrome { get; private set; }
         protected WebDriverWait Waiter { get; private protected set; }
         protected INavigation Navigator { get; private set; }
-        public CrawlerBase(string baseUrl, string username, string password, byte actionsTimeOutInSec = 30)
+        public CrawlerBase(string baseUrl, string username, string password, byte actionsTimeOutInSec = 60)
         {
             BaseUrl = baseUrl;
             Username = username;
@@ -139,13 +139,20 @@ namespace MoocDownloader.Shared.Models.Base
 
         public void Dispose()
         {
-            Chrome?.Close();
-            Chrome?.Quit();
-            Chrome?.Dispose();
-            Chrome = null;
-            Waiter = null;
-            Navigator = null;
-            GC.Collect();
+            try
+            {
+                Chrome?.Close();
+                Chrome?.Quit();
+                Chrome?.Dispose();
+                Chrome = null;
+                Waiter = null;
+                Navigator = null;
+                GC.Collect();
+            }
+            catch
+            {
+
+            }
         }
 
         ~CrawlerBase()

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MoocDownloader.Shared.Models.DataTransferObjects
+namespace MoocDownloader.Shared.Models.Base
 {
     public class CrawlerResult
     {

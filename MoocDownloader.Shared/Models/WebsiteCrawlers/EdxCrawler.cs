@@ -10,7 +10,7 @@ using System.Threading;
 
 namespace MoocDownloader.Shared.Models.WebsiteCrawlers
 {
-    [CrawlerInfo("Edx", "https://edx.org/", 4, implemented: true, authenticationRequired: true, courseLinkFormat: @"^http(s)?:\/\/(www.)?learning.edx.org\/course\/.*\/home(\/)?$")]
+    [CrawlerInfo("Edx", "https://edx.org/", 3, implemented: true, authenticationRequired: true, courseLinkRegexFormat: @"^http(s)?:\/\/(www.)?learning.edx.org\/course\/.*\/home(\/)?$")]
     public class EdxCrawler : CrawlerBase
     {
         private const string Url = "https://authn.edx.org/login";

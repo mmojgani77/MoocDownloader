@@ -13,15 +13,15 @@ namespace MoocDownloader.Shared.Models.Base.Attributes
         public string WebsiteUrl { get; }
         public bool Implemented { get; }
         public bool AuthenticationRequired { get; }
-        public Regex CourseLinkFormat { get; set; }
-        public CrawlerInfoAttribute(string title, string websiteUrl, int indexNumber = -1, bool implemented = true, bool authenticationRequired = false, string courseLinkFormat = null)
+        public string CourseLinkRegexFormat { get; set; }
+        public CrawlerInfoAttribute(string title, string websiteUrl, int indexNumber = -1, bool implemented = true, bool authenticationRequired = false, string courseLinkRegexFormat = null)
         {
             Title = title;
             WebsiteUrl = websiteUrl;
             Index = GenerateCurrentIndex(indexNumber);
             Implemented = implemented;
             AuthenticationRequired = authenticationRequired;
-            CourseLinkFormat = string.IsNullOrWhiteSpace(courseLinkFormat) ? null : new Regex(courseLinkFormat);
+            CourseLinkRegexFormat = courseLinkRegexFormat;
         }
 
         private int GenerateCurrentIndex(int indexNumber)

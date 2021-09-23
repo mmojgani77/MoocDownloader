@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace MoocDownloader.Shared.Models.WebsiteCrawlers
 {
-    [CrawlerInfo("Alaa tv", "https://alaatv.com/", indexNumber: 3, authenticationRequired: false, courseLinkFormat: "^http(s)?:\\/\\/(www.)?alaatv.com\\/set\\/\\d*$")]
+    [CrawlerInfo("Alaa tv", "https://alaatv.com/", indexNumber: 2, authenticationRequired: false, courseLinkRegexFormat: "^http(s)?:\\/\\/(www.)?alaatv.com\\/set\\/\\d*$")]
     public class AlaaTvCrawler : CrawlerBase
     {
         private const string Url = "https://alaatv.com/";

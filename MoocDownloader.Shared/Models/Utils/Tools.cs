@@ -1,6 +1,7 @@
 ﻿using MoocDownloader.Shared.Models.Base;
 using MoocDownloader.Shared.Models.Base.Attributes;
 using MoocDownloader.Shared.Models.DataTransferObjects;
+using MoocDownloader.Shared.Models.Repository;
 using MoocDownloader.Shared.Models.Utils;
 using System;
 using System.Collections.Generic;
@@ -12,23 +13,22 @@ namespace MoocDownloader.Shared.Base
 {
     public static class Tools
     {
-        public static IEnumerable<CrawlerInfoDto> GetCrawlers()
+        public static CrawlerFactory GetCrawlerFactory()
         {
             var crawlers = typeof(CrawlerBase).InheritedTypes().WithAttribute<CrawlerInfoAttribute>();
-            return crawlers.Select(x =>
-            {
-                var attr = x.GetCustomAttribute<CrawlerInfoAttribute>();
-                return new CrawlerInfoDto
-                {
-                    Title = attr.Title,
-                    WebsiteUrl = attr.WebsiteUrl,
-                    CrawlerType = x,
-                    Index = attr.Index,
-                    Implemented = attr.Implemented,
-                    AuthenticationRequired = attr.AuthenticationRequired,
-                    CourseLinkFormat = attr.CourseLinkFormat
-                };
-            });
+            return new CrawlerFactory(crawlers.Select(x =>
+               {
+                   var attr = x.GetCustomAttribute<CrawlerInfoAttribute>();
+                   var crawlerInfo = new CrawlerInfo(x, attr.Index, attr.Title, attr.WebsiteUrl, attr.CourseLinkRegexFormat);
+
+                   if (attr.AuthenticationRequired)
+                       crawlerInfo.SetAuthenticationRequiredFlag();
+
+                   if (attr.Implemented)
+                       crawlerInfo.SetImplementedFlag();
+
+                   return crawlerInfo;
+               }));
         }
     }
 }
