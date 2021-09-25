@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoocDownloader.Shared", "MoocDownloader.Shared\MoocDownloader.Shared.csproj", "{01438297-FF72-4485-881B-B0A0801CB477}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoocDownloader.Shared", "MoocDownloader.Shared\MoocDownloader.Shared.csproj", "{01438297-FF72-4485-881B-B0A0801CB477}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoocDownloader.WinForm", "MoocDownloader.WinForm\MoocDownloader.WinForm.csproj", "{5AC0C72C-CAF1-4EB4-8FC9-1A95459F29DD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoocDownloader.WinForm", "MoocDownloader.WinForm\MoocDownloader.WinForm.csproj", "{5AC0C72C-CAF1-4EB4-8FC9-1A95459F29DD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoocDownloader.IDMImporter", "MoocDownloader.IDMImporter\MoocDownloader.IDMImporter\MoocDownloader.IDMImporter.csproj", "{4610B711-9F65-4A8B-8BB4-491AC98DA13E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{5AC0C72C-CAF1-4EB4-8FC9-1A95459F29DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5AC0C72C-CAF1-4EB4-8FC9-1A95459F29DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5AC0C72C-CAF1-4EB4-8FC9-1A95459F29DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4610B711-9F65-4A8B-8BB4-491AC98DA13E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4610B711-9F65-4A8B-8BB4-491AC98DA13E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4610B711-9F65-4A8B-8BB4-491AC98DA13E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4610B711-9F65-4A8B-8BB4-491AC98DA13E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

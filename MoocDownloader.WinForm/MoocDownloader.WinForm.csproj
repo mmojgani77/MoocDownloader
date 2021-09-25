@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MoocDownloader.IDMImporter\MoocDownloader.IDMImporter\MoocDownloader.IDMImporter.csproj" />
     <ProjectReference Include="..\MoocDownloader.Shared\MoocDownloader.Shared.csproj" />
   </ItemGroup>
 

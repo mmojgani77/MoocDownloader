@@ -1,22 +1,14 @@
 ﻿using MoocDownloader.Shared.Models.Base;
-using MoocDownloader.Shared.Models.Base.Attributes;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using MoocDownloader.Shared.Models.Utils;
-using MoocDownloader.Shared.Base;
 using MoocDownloader.Shared.Models.DataTransferObjects;
 using System.Threading;
 using System.IO;
 using MoocDownloader.WinForm.Assets;
-using MoocDownloader.Shared.Models.Repository;
 using MoocDownloader.Shared.Models.Services;
+using MoocDownloader.WinForm.Models;
+using MoocDownloader.WinForm.Models.Components;
 
 namespace MoocDownloader.WinForm
 {
@@ -28,7 +20,14 @@ namespace MoocDownloader.WinForm
         public MainForm()
         {
             InitializeComponent();
+            (menuStrip1.Items[0] as ToolStripMenuItem).DropDownItems[0].Click += IDMImporterMenuItem_Click;
             _started = false;
+        }
+
+        private void IDMImporterMenuItem_Click(object sender, EventArgs e)
+        {
+            var importer = new IDMImporter.IDMImporter();
+            importer.ShowDialog();
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -208,5 +207,6 @@ namespace MoocDownloader.WinForm
 
             return isCourseLinkValid;
         }
+
     }
 }
