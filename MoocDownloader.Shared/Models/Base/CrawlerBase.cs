@@ -4,9 +4,11 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using WebDriverManager.DriverConfigs.Impl;
 
 namespace MoocDownloader.Shared.Models.Base
 {
@@ -24,7 +26,10 @@ namespace MoocDownloader.Shared.Models.Base
             BaseUrl = baseUrl;
             Username = username;
             Password = password;
-            var service = ChromeDriverService.CreateDefaultService();
+            var path = new WebDriverManager.DriverManager().SetUpDriver(new ChromeConfig());
+            var directory = Path.GetDirectoryName(path);
+            var fileName = Path.GetFileName(path);
+            var service = ChromeDriverService.CreateDefaultService(directory,fileName);
             service.HideCommandPromptWindow = true;
             Chrome = new ChromeDriver(service);
             Waiter = new WebDriverWait(Chrome, TimeSpan.FromSeconds(actionsTimeOutInSec));
