@@ -48,9 +48,11 @@ namespace MoocDownloader.WinForm
             this.progressCrawl = new System.Windows.Forms.ProgressBar();
             this.checkPageLimits = new System.Windows.Forms.CheckBox();
             this.gpPageLimits = new System.Windows.Forms.GroupBox();
-            this.menuStrip1 = new CustomMenuStrip();
+            this.menuStrip1 = new MoocDownloader.WinForm.Models.Components.CustomMenuStrip();
             this.toolsMenuStripItem = new System.Windows.Forms.ToolStripMenuItem();
             this.idmImporterMenuStripItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.label2 = new System.Windows.Forms.Label();
+            this.comboBrowsers = new System.Windows.Forms.ComboBox();
             this.gpPageLimits.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -62,7 +64,7 @@ namespace MoocDownloader.WinForm
             this.comboCrawlers.FormattingEnabled = true;
             this.comboCrawlers.IntegralHeight = false;
             this.comboCrawlers.ItemHeight = 20;
-            this.comboCrawlers.Location = new System.Drawing.Point(192, 41);
+            this.comboCrawlers.Location = new System.Drawing.Point(192, 97);
             this.comboCrawlers.Name = "comboCrawlers";
             this.comboCrawlers.Size = new System.Drawing.Size(374, 28);
             this.comboCrawlers.TabIndex = 0;
@@ -71,7 +73,7 @@ namespace MoocDownloader.WinForm
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(14, 44);
+            this.label1.Location = new System.Drawing.Point(14, 100);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(172, 20);
             this.label1.TabIndex = 1;
@@ -80,7 +82,7 @@ namespace MoocDownloader.WinForm
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(18, 181);
+            this.label3.Location = new System.Drawing.Point(18, 237);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(155, 20);
             this.label3.TabIndex = 20;
@@ -89,7 +91,7 @@ namespace MoocDownloader.WinForm
             // lblPassword
             // 
             this.lblPassword.AutoSize = true;
-            this.lblPassword.Location = new System.Drawing.Point(18, 134);
+            this.lblPassword.Location = new System.Drawing.Point(18, 190);
             this.lblPassword.Name = "lblPassword";
             this.lblPassword.Size = new System.Drawing.Size(87, 20);
             this.lblPassword.TabIndex = 19;
@@ -98,7 +100,7 @@ namespace MoocDownloader.WinForm
             // lblUsername
             // 
             this.lblUsername.AutoSize = true;
-            this.lblUsername.Location = new System.Drawing.Point(18, 94);
+            this.lblUsername.Location = new System.Drawing.Point(18, 150);
             this.lblUsername.Name = "lblUsername";
             this.lblUsername.Size = new System.Drawing.Size(92, 20);
             this.lblUsername.TabIndex = 18;
@@ -106,14 +108,14 @@ namespace MoocDownloader.WinForm
             // 
             // courseLinkBox
             // 
-            this.courseLinkBox.Location = new System.Drawing.Point(173, 180);
+            this.courseLinkBox.Location = new System.Drawing.Point(173, 236);
             this.courseLinkBox.Name = "courseLinkBox";
             this.courseLinkBox.Size = new System.Drawing.Size(393, 27);
             this.courseLinkBox.TabIndex = 17;
             // 
             // passwordBox
             // 
-            this.passwordBox.Location = new System.Drawing.Point(123, 134);
+            this.passwordBox.Location = new System.Drawing.Point(123, 190);
             this.passwordBox.Name = "passwordBox";
             this.passwordBox.Size = new System.Drawing.Size(443, 27);
             this.passwordBox.TabIndex = 16;
@@ -121,14 +123,14 @@ namespace MoocDownloader.WinForm
             // 
             // usernameBox
             // 
-            this.usernameBox.Location = new System.Drawing.Point(123, 91);
+            this.usernameBox.Location = new System.Drawing.Point(123, 147);
             this.usernameBox.Name = "usernameBox";
             this.usernameBox.Size = new System.Drawing.Size(443, 27);
             this.usernameBox.TabIndex = 15;
             // 
             // btnCrawl
             // 
-            this.btnCrawl.Location = new System.Drawing.Point(18, 235);
+            this.btnCrawl.Location = new System.Drawing.Point(18, 291);
             this.btnCrawl.Name = "btnCrawl";
             this.btnCrawl.Size = new System.Drawing.Size(261, 37);
             this.btnCrawl.TabIndex = 14;
@@ -139,7 +141,7 @@ namespace MoocDownloader.WinForm
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(16, 36);
+            this.label5.Location = new System.Drawing.Point(7, 51);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(143, 20);
             this.label5.TabIndex = 8;
@@ -147,14 +149,14 @@ namespace MoocDownloader.WinForm
             // 
             // toPageBox
             // 
-            this.toPageBox.Location = new System.Drawing.Point(160, 65);
+            this.toPageBox.Location = new System.Drawing.Point(151, 80);
             this.toPageBox.Name = "toPageBox";
             this.toPageBox.Size = new System.Drawing.Size(89, 27);
             this.toPageBox.TabIndex = 10;
             // 
             // fromPageBox
             // 
-            this.fromPageBox.Location = new System.Drawing.Point(160, 33);
+            this.fromPageBox.Location = new System.Drawing.Point(151, 48);
             this.fromPageBox.Name = "fromPageBox";
             this.fromPageBox.Size = new System.Drawing.Size(89, 27);
             this.fromPageBox.TabIndex = 7;
@@ -162,7 +164,7 @@ namespace MoocDownloader.WinForm
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(18, 68);
+            this.label6.Location = new System.Drawing.Point(9, 83);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(125, 20);
             this.label6.TabIndex = 9;
@@ -170,7 +172,7 @@ namespace MoocDownloader.WinForm
             // 
             // lblProgress
             // 
-            this.lblProgress.Location = new System.Drawing.Point(432, 337);
+            this.lblProgress.Location = new System.Drawing.Point(432, 393);
             this.lblProgress.Name = "lblProgress";
             this.lblProgress.Size = new System.Drawing.Size(134, 29);
             this.lblProgress.TabIndex = 24;
@@ -179,7 +181,7 @@ namespace MoocDownloader.WinForm
             // 
             // progressCrawl
             // 
-            this.progressCrawl.Location = new System.Drawing.Point(18, 337);
+            this.progressCrawl.Location = new System.Drawing.Point(18, 393);
             this.progressCrawl.Name = "progressCrawl";
             this.progressCrawl.Size = new System.Drawing.Size(408, 29);
             this.progressCrawl.TabIndex = 23;
@@ -187,7 +189,7 @@ namespace MoocDownloader.WinForm
             // checkPageLimits
             // 
             this.checkPageLimits.AutoSize = true;
-            this.checkPageLimits.Location = new System.Drawing.Point(18, 288);
+            this.checkPageLimits.Location = new System.Drawing.Point(18, 344);
             this.checkPageLimits.Name = "checkPageLimits";
             this.checkPageLimits.Size = new System.Drawing.Size(148, 24);
             this.checkPageLimits.TabIndex = 21;
@@ -201,7 +203,7 @@ namespace MoocDownloader.WinForm
             this.gpPageLimits.Controls.Add(this.toPageBox);
             this.gpPageLimits.Controls.Add(this.fromPageBox);
             this.gpPageLimits.Controls.Add(this.label6);
-            this.gpPageLimits.Location = new System.Drawing.Point(299, 224);
+            this.gpPageLimits.Location = new System.Drawing.Point(299, 280);
             this.gpPageLimits.Name = "gpPageLimits";
             this.gpPageLimits.Size = new System.Drawing.Size(267, 108);
             this.gpPageLimits.TabIndex = 22;
@@ -212,13 +214,14 @@ namespace MoocDownloader.WinForm
             // menuStrip1
             // 
             this.menuStrip1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.menuStrip1.ForeColor = System.Drawing.Color.White;
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolsMenuStripItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-            this.menuStrip1.Size = new System.Drawing.Size(587, 28);
+            this.menuStrip1.Size = new System.Drawing.Size(580, 28);
             this.menuStrip1.TabIndex = 25;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -239,11 +242,34 @@ namespace MoocDownloader.WinForm
             this.idmImporterMenuStripItem.Size = new System.Drawing.Size(182, 26);
             this.idmImporterMenuStripItem.Text = "IDM Importer";
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(14, 51);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(73, 20);
+            this.label2.TabIndex = 27;
+            this.label2.Text = "Browser : ";
+            // 
+            // comboBrowsers
+            // 
+            this.comboBrowsers.DropDownHeight = 200;
+            this.comboBrowsers.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBrowsers.FormattingEnabled = true;
+            this.comboBrowsers.IntegralHeight = false;
+            this.comboBrowsers.ItemHeight = 20;
+            this.comboBrowsers.Location = new System.Drawing.Point(93, 48);
+            this.comboBrowsers.Name = "comboBrowsers";
+            this.comboBrowsers.Size = new System.Drawing.Size(473, 28);
+            this.comboBrowsers.TabIndex = 26;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(587, 382);
+            this.ClientSize = new System.Drawing.Size(580, 442);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.comboBrowsers);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.lblPassword);
             this.Controls.Add(this.lblUsername);
@@ -299,6 +325,8 @@ namespace MoocDownloader.WinForm
         private CustomMenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem toolsMenuStripItem;
         private System.Windows.Forms.ToolStripMenuItem idmImporterMenuStripItem;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.ComboBox comboBrowsers;
     }
 }
 

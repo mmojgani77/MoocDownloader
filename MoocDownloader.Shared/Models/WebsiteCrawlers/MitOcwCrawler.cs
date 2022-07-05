@@ -1,5 +1,6 @@
 ﻿using MoocDownloader.Shared.Models.Base;
 using MoocDownloader.Shared.Models.Base.Attributes;
+using MoocDownloader.Shared.Models.Enum;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,7 +13,7 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
     {
         private const string Url = "https://ocw.mit.edu/";
 
-        public MitOcwCrawler(string username, string password) : base(Url, username, password)
+        public MitOcwCrawler(string username, string password, SupportedBrowsers supportedBrowser) : base(Url, username, password, supportedBrowser)
         {
 
         }

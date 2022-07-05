@@ -1,5 +1,6 @@
 ﻿using MoocDownloader.Shared.Models.Base;
 using MoocDownloader.Shared.Models.Base.Attributes;
+using MoocDownloader.Shared.Models.Enum;
 using OpenQA.Selenium;
 using SeleniumExtras.WaitHelpers;
 using System;
@@ -14,7 +15,7 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
     public class GotoClassCrawler : CrawlerBase
     {
         private const string Url = "https://dars.gotoclass.ir/login";
-        public GotoClassCrawler(string username, string password) : base(Url, username, password)
+        public GotoClassCrawler(string username, string password, SupportedBrowsers supportedBrowser) : base(Url, username, password, supportedBrowser)
         {
 
         }
@@ -27,7 +28,7 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
                 usernameInput.SendKeys(Username);
                 var passwordInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("input[name=password]")));
                 passwordInput.SendKeys(Password);
-                var loginButton = Chrome.FindElementByCssSelector("button[type=submit]");
+                var loginButton = Browser.FindElement(By.CssSelector("button[type=submit]"));
                 loginButton.Click();
                 Waiter.Until(ExpectedConditions.ElementExists(By.CssSelector(".nav-item a[href*=dashboard]")));
                 return true;
@@ -40,7 +41,7 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
 
         protected override Queue<string> ExtractAllCoursePagesFromCourseListPage()
         {
-            var pages = Chrome.FindElementsByCssSelector(".subsection-text");
+            var pages = Browser.FindElements(By.CssSelector(".subsection-text"));
             var pagesQueue = new Queue<string>(pages.Select(x => x.GetAttribute("href")));
             return pagesQueue;
         }
@@ -50,11 +51,11 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
             try
             {
                 var videoUrls = new List<string>();
-                var presentations = Chrome.FindElementsByCssSelector("li[role=presentation]").ToArray();
+                var presentations = Browser.FindElements(By.CssSelector("li[role=presentation]")).ToArray();
                 foreach (var presentation in presentations)
                 {
                     presentation.Click();
-                    var videoSource = Chrome.FindElementsByCssSelector("video source[src*=mp4]").FirstOrDefault();
+                    var videoSource = Browser.FindElements(By.CssSelector("video source[src*=mp4]")).FirstOrDefault();
                     var src = videoSource?.GetAttribute("src");
                     if (!string.IsNullOrWhiteSpace(src))
                     {

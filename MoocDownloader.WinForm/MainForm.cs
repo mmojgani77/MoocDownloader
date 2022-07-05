@@ -9,6 +9,7 @@ using MoocDownloader.WinForm.Assets;
 using MoocDownloader.Shared.Models.Services;
 using MoocDownloader.WinForm.Models;
 using MoocDownloader.WinForm.Models.Components;
+using MoocDownloader.Shared.Models.Enum;
 
 namespace MoocDownloader.WinForm
 {
@@ -35,6 +36,7 @@ namespace MoocDownloader.WinForm
             usernameBox.Text = Settings.Default.Username;
             passwordBox.Text = Settings.Default.Password;
             LoadAllCrawlers(comboCrawlers);
+            LoadAllBrowsers(comboBrowsers);
         }
 
         private void LoadAllCrawlers(ComboBox combo)
@@ -42,6 +44,15 @@ namespace MoocDownloader.WinForm
             _crawlerService = new CrawlerService();
             var listOfTitles = _crawlerService.GetAllCrawlersTitle();
             combo.Items.AddRange(listOfTitles);
+            combo.SelectedIndex = 0;
+        }
+
+        private void LoadAllBrowsers(ComboBox combo)
+        {
+            foreach (var browser in Enum.GetNames<SupportedBrowsers>())
+            {
+                combo.Items.Add(browser);
+            }
             combo.SelectedIndex = 0;
         }
 
@@ -123,8 +134,9 @@ namespace MoocDownloader.WinForm
                         Password = password,
                         Username = username,
                         Progress = Progress,
-                        StoppingToken = _cancellationTokenSource.Token
-                    });
+                        StoppingToken = _cancellationTokenSource.Token,
+                        SupportedBrowser = (SupportedBrowsers)comboBrowsers.SelectedIndex
+                    }) ;
 
                     if (response.HasError || response.Result == null)
                     {

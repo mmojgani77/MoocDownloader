@@ -1,5 +1,6 @@
 ﻿using MoocDownloader.Shared.Models.Base;
 using MoocDownloader.Shared.Models.Base.Attributes;
+using MoocDownloader.Shared.Models.Enum;
 using OpenQA.Selenium;
 using SeleniumExtras.WaitHelpers;
 using System;
@@ -15,7 +16,7 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
     public class AlaaTvCrawler : CrawlerBase
     {
         private const string Url = "https://alaatv.com/";
-        public AlaaTvCrawler(string username, string password) : base(Url, username, password)
+        public AlaaTvCrawler(string username, string password, SupportedBrowsers supportedBrowser) : base(Url, username, password,supportedBrowser)
         {
 
         }
@@ -28,7 +29,7 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
         protected override Queue<string> ExtractAllCoursePagesFromCourseListPage()
         {
             ScrollToEndOfPage();
-            var pages = Chrome.FindElementsByCssSelector(".a--list1-title a");
+            var pages = Browser.FindElements(By.CssSelector(".a--list1-title a"));
             var pagesQueue = new Queue<string>(pages.Select(x => x.GetAttribute("href")));
             return pagesQueue;
         }
@@ -37,10 +38,10 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
             string oldScy, newScy;
             do
             {
-                oldScy = Chrome.ExecuteScript("return window.scrollY;").ToString();
-                Chrome.ExecuteScript("window.scroll(0, document.body.scrollHeight);");
+                oldScy = Browser.ExecuteScript("return window.scrollY;").ToString();
+                Browser.ExecuteScript("window.scroll(0, document.body.scrollHeight);");
                 Task.Delay(10).Wait();
-                newScy = Chrome.ExecuteScript("return window.scrollY;").ToString();
+                newScy = Browser.ExecuteScript("return window.scrollY;").ToString();
             }
             while (oldScy != newScy);
         }
@@ -50,7 +51,7 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
             var result = new List<string>();
             try
             {
-                var videoSource = Chrome.FindElementsByCssSelector("source").FirstOrDefault();
+                var videoSource = Browser.FindElements(By.CssSelector("source")).FirstOrDefault();
                 var src = videoSource?.GetAttribute("src");
                 if (!string.IsNullOrWhiteSpace(src))
                 {

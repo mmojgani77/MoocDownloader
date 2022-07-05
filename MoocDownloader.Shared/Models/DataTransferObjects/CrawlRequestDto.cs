@@ -1,4 +1,5 @@
 ﻿using MoocDownloader.Shared.Models.Base;
+using MoocDownloader.Shared.Models.Enum;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,6 +15,7 @@ namespace MoocDownloader.Shared.Models.DataTransferObjects
         public string CourseLink { get; set; }
         public int? FromPage { get; set; }
         public int? ToPage { get; set; }
+        public SupportedBrowsers SupportedBrowser { get; set; }
         public CancellationToken StoppingToken { get; set; }
     }
 }

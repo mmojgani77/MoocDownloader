@@ -1,5 +1,6 @@
 ﻿using MoocDownloader.Shared.Models.Base;
 using MoocDownloader.Shared.Models.Base.Attributes;
+using MoocDownloader.Shared.Models.Enum;
 using OpenQA.Selenium;
 using SeleniumExtras.WaitHelpers;
 using System;
@@ -14,7 +15,7 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
     public class EdxCrawler : CrawlerBase
     {
         private const string Url = "https://authn.edx.org/login";
-        public EdxCrawler(string username, string password) : base(Url, username, password)
+        public EdxCrawler(string username, string password, SupportedBrowsers supportedBrowser) : base(Url, username, password, supportedBrowser)
         {
 
         }
@@ -22,7 +23,7 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
         protected override Queue<string> ExtractAllCoursePagesFromCourseListPage()
         {
             Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector(".pgn_collapsible")));
-            var sections = Chrome.FindElementsByCssSelector(".pgn_collapsible");
+            var sections = Browser.FindElements(By.CssSelector(".pgn_collapsible"));
             var result = new Queue<string>();
             foreach (var section in sections)
             {
@@ -68,7 +69,7 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
                 Navigator.GoToUrl(frameLink);
                 try
                 {
-                    var downloadButton = Chrome.FindElementByCssSelector("a.video-download-button");
+                    var downloadButton = Browser.FindElement(By.CssSelector("a.video-download-button"));
                     var link = downloadButton?.GetAttribute("href");
                     if (!string.IsNullOrWhiteSpace(link))
                         result.Add(link);
@@ -90,7 +91,7 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
                 usernameInput.SendKeys(Username);
                 var passwordInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("input[name=password]")));
                 passwordInput.SendKeys(Password);
-                var loginButton = Chrome.FindElementByCssSelector("button[type=submit]");
+                var loginButton = Browser.FindElement(By.CssSelector("button[type=submit]"));
                 loginButton.Click();
                 Waiter.Until(ExpectedConditions.ElementExists(By.CssSelector(".nav-item a[href*=dashboard]")));
                 return true;

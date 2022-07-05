@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MoocDownloader.Shared.Models.Enum;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -36,14 +37,14 @@ namespace MoocDownloader.Shared.Models.Base
             AuthenticationRequired = true;
         }
 
-        internal CrawlerBase CreateInstanceOfCrawler(string username, string password)
+        internal CrawlerBase CreateInstanceOfCrawler(string username, string password, SupportedBrowsers supportedBrowser)
         {
             if (!AuthenticationRequired)
             {
                 username = "";
                 password = "";
             }
-            var crawler = (CrawlerBase)Activator.CreateInstance(CrawlerType, new object[] { username, password });
+            var crawler = (CrawlerBase)Activator.CreateInstance(CrawlerType, new object[] { username, password, supportedBrowser });
             return crawler;
         }
 

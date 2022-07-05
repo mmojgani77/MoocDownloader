@@ -1,13 +1,17 @@
 ﻿using MoocDownloader.Shared.Models.DataTransferObjects;
+using MoocDownloader.Shared.Models.Enum;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using WebDriverManager.DriverConfigs.Impl;
 
 namespace MoocDownloader.Shared.Models.Base
@@ -18,23 +22,54 @@ namespace MoocDownloader.Shared.Models.Base
         public string Username { get; private set; }
         public string Password { get; private set; }
         public bool IsLogin { get; private set; }
-        protected ChromeDriver Chrome { get; private set; }
+        protected WebDriver Browser { get; private set; }
         protected WebDriverWait Waiter { get; private protected set; }
         protected INavigation Navigator { get; private set; }
-        public CrawlerBase(string baseUrl, string username, string password, byte actionsTimeOutInSec = 60)
+        public CrawlerBase(string baseUrl, string username, string password, SupportedBrowsers supportedBrowser, byte actionsTimeOutInSec = 120)
         {
             BaseUrl = baseUrl;
             Username = username;
             Password = password;
-            var path = new WebDriverManager.DriverManager().SetUpDriver(new ChromeConfig());
+            ConfigureBrowser(supportedBrowser, actionsTimeOutInSec);
+        }
+        private void ConfigureBrowser(SupportedBrowsers supportedBrowser, byte actionsTimeOutInSec)
+        {
+            var driverManager = new WebDriverManager.DriverManager();
+            switch (supportedBrowser)
+            {
+                case SupportedBrowsers.Chrome:
+                    SetupChrome(driverManager);
+                    break;
+                case SupportedBrowsers.Firefox:
+                    SetupFirefox(driverManager);
+                    break;
+                default:
+                    throw new Exception("Does not support this browser");
+            }
+
+            Waiter = new WebDriverWait(Browser, TimeSpan.FromSeconds(actionsTimeOutInSec));
+            Navigator = Browser.Navigate();
+        }
+
+        private void SetupChrome(WebDriverManager.DriverManager driverManager)
+        {
+            var path = driverManager.SetUpDriver(new ChromeConfig());
             var directory = Path.GetDirectoryName(path);
             var fileName = Path.GetFileName(path);
-            var service = ChromeDriverService.CreateDefaultService(directory,fileName);
+            var service = ChromeDriverService.CreateDefaultService(directory, fileName);
             service.HideCommandPromptWindow = true;
-            Chrome = new ChromeDriver(service);
-            Waiter = new WebDriverWait(Chrome, TimeSpan.FromSeconds(actionsTimeOutInSec));
-            Navigator = Chrome.Navigate();
+            Browser = new ChromeDriver(service);
         }
+        private void SetupFirefox(WebDriverManager.DriverManager driverManager)
+        {
+            var path = driverManager.SetUpDriver(new FirefoxConfig());
+            var directory = Path.GetDirectoryName(path);
+            var fileName = Path.GetFileName(path);
+            var service = FirefoxDriverService.CreateDefaultService(directory, fileName);
+            service.HideCommandPromptWindow = true;
+            Browser = new FirefoxDriver(service);
+        }
+
         public CrawlerResult ExtractAllVideoUrlsOfCourse(Action<ProgressValue> progress, string coursePageLink, int? fromPage = null, int? toPage = null, CancellationToken stoppingToken = default)
         {
             var result = new CrawlerResult();
@@ -146,10 +181,10 @@ namespace MoocDownloader.Shared.Models.Base
         {
             try
             {
-                Chrome?.Close();
-                Chrome?.Quit();
-                Chrome?.Dispose();
-                Chrome = null;
+                Browser?.Close();
+                Browser?.Quit();
+                Browser?.Dispose();
+                Browser = null;
                 Waiter = null;
                 Navigator = null;
                 GC.Collect();

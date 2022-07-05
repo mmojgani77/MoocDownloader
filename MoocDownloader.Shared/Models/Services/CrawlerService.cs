@@ -1,6 +1,7 @@
 ﻿using MoocDownloader.Shared.Base;
 using MoocDownloader.Shared.Models.Base;
 using MoocDownloader.Shared.Models.DataTransferObjects;
+using MoocDownloader.Shared.Models.Enum;
 using MoocDownloader.Shared.Models.Repository;
 using System;
 using System.Collections.Generic;
@@ -111,7 +112,7 @@ namespace MoocDownloader.Shared.Models.Services
         {
             var response = new CrawlResponseDto();
             CrawlerResult crawlerResult = null;
-            using (var crawler = crawlerInfo.CreateInstanceOfCrawler(request.Username, request.Password))
+            using (var crawler = crawlerInfo.CreateInstanceOfCrawler(request.Username, request.Password, request.SupportedBrowser))
             {
                 await Task.Run(() =>
                 {
