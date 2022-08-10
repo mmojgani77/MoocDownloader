@@ -23,6 +23,14 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
         protected override Queue<string> ExtractAllCoursePagesFromCourseListPage()
         {
             Waiter.Until(ExpectedConditions.ElementExists(By.CssSelector(".classroom-toc-section")));
+            var collapsed = Browser.FindElements(By.CssSelector(".classroom-toc-section--collapsed>h2>button"));
+
+            foreach (var item in collapsed)
+            {
+                Browser.ExecuteScript("arguments[0].click()", item);
+                Task.Delay(50).Wait();
+            }
+
             var itemsLink = Browser.FindElements(By.CssSelector("a.classroom-toc-item__link"))
                             .Select(x => x.GetAttribute("href"))
                             .ToArray();
@@ -80,7 +88,7 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
                 passwordInput.SendKeys(Password);
                 var loginButton = Browser.FindElement(By.CssSelector("button[type=submit]"));
                 loginButton.Click();
-                Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector(".global-nav__primary-items")));
+                Waiter.Until(ExpectedConditions.UrlContains("/feed"));
                 return true;
             }
             catch
