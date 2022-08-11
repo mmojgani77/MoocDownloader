@@ -17,42 +17,34 @@ namespace MoocDownloader.Shared.Models
     public class MaktabkhoonehCrawler : CrawlerBase
     {
         private const string MaktabkhoonehUrl = "https://maktabkhooneh.com";
-        public MaktabkhoonehCrawler(string username, string password, SupportedBrowsers supportedBrowser) : base(MaktabkhoonehUrl, username, password,supportedBrowser)
+        public MaktabkhoonehCrawler(string username, string password, SupportedBrowsers supportedBrowser) : base(MaktabkhoonehUrl, username, password, supportedBrowser)
         {
 
         }
 
-        protected sealed override bool Login()
+        protected sealed override void Login(CancellationToken stoppingToken)
         {
-            try
-            {
-                var loginButton = Browser.FindElement(By.CssSelector("button[type=submit]"));
-                loginButton.Click();
-                var usernameInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("input[name=tessera]")));
-                usernameInput.SendKeys(Username);
-                var submitButton = Browser.FindElement(By.CssSelector(".filler.js-check-active-user-form input[type=submit]"));
-                submitButton.Click();
-                var passwordInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("input[name=password]")));
-                passwordInput.SendKeys(Password);
-                submitButton = Browser.FindElement(By.CssSelector(".filler.js-login-authentication-nv-form input[type=submit]"));
-                submitButton.Click();
-                Waiter.Until(ExpectedConditions.ElementExists(By.CssSelector(".navbar__signin a[href*=dashboard]")));
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            var loginButton = Browser.FindElement(By.CssSelector("button[type=submit]"));
+            loginButton.Click();
+            var usernameInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("input[name=tessera]")), stoppingToken);
+            usernameInput.SendKeys(Username);
+            var submitButton = Browser.FindElement(By.CssSelector(".filler.js-check-active-user-form input[type=submit]"));
+            submitButton.Click();
+            var passwordInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("input[name=password]")), stoppingToken);
+            passwordInput.SendKeys(Password);
+            submitButton = Browser.FindElement(By.CssSelector(".filler.js-login-authentication-nv-form input[type=submit]"));
+            submitButton.Click();
+            Waiter.Until(ExpectedConditions.ElementExists(By.CssSelector(".navbar__signin a[href*=dashboard]")), stoppingToken);
         }
 
-        protected override Queue<string> ExtractAllCoursePagesFromCourseListPage(CancellationToken stoppingToken)
+        protected override sealed Queue<string> ExtractAllCoursePagesFromCourseListPage(CancellationToken stoppingToken)
         {
             var pages = Browser.FindElements(By.CssSelector(".chapter__unit"));
             var pagesQueue = new Queue<string>(pages.Select(x => x.GetAttribute("href")));
             return pagesQueue;
         }
 
-        protected override List<string> ExtractEachCoursePageVideoUrls(CancellationToken stoppingToken)
+        protected override sealed List<string> ExtractEachCoursePageVideoUrls(CancellationToken stoppingToken)
         {
             var result = new List<string>();
             try

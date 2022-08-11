@@ -20,33 +20,25 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
 
         }
 
-        protected sealed override bool Login()
+        protected sealed override void Login(CancellationToken stoppingToken)
         {
-            try
-            {
-                var usernameInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("input[name=email]")));
-                usernameInput.SendKeys(Username);
-                var passwordInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("input[name=password]")));
-                passwordInput.SendKeys(Password);
-                var loginButton = Browser.FindElement(By.CssSelector("button[type=submit]"));
-                loginButton.Click();
-                Waiter.Until(ExpectedConditions.ElementExists(By.CssSelector(".nav-item a[href*=dashboard]")));
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            var usernameInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("input[name=email]")), stoppingToken);
+            usernameInput.SendKeys(Username);
+            var passwordInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("input[name=password]")), stoppingToken);
+            passwordInput.SendKeys(Password);
+            var loginButton = Browser.FindElement(By.CssSelector("button[type=submit]"));
+            loginButton.Click();
+            Waiter.Until(ExpectedConditions.ElementExists(By.CssSelector(".nav-item a[href*=dashboard]")), stoppingToken);
         }
 
-        protected override Queue<string> ExtractAllCoursePagesFromCourseListPage(CancellationToken stoppingToken)
+        protected override sealed Queue<string> ExtractAllCoursePagesFromCourseListPage(CancellationToken stoppingToken)
         {
             var pages = Browser.FindElements(By.CssSelector(".subsection-text"));
             var pagesQueue = new Queue<string>(pages.Select(x => x.GetAttribute("href")));
             return pagesQueue;
         }
 
-        protected override List<string> ExtractEachCoursePageVideoUrls(CancellationToken stoppingToken)
+        protected override sealed List<string> ExtractEachCoursePageVideoUrls(CancellationToken stoppingToken)
         {
             try
             {
@@ -59,9 +51,12 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
                     var src = videoSource?.GetAttribute("src");
                     if (!string.IsNullOrWhiteSpace(src))
                     {
-                        var orgSrc = src.Substring(0, src.LastIndexOf('?'));
+                        var orgSrc = src[..src.LastIndexOf('?')];
                         videoUrls.Add(orgSrc);
                     }
+                    
+                    if (stoppingToken.IsCancellationRequested)
+                        break;
                 }
                 return videoUrls;
             }

@@ -76,33 +76,35 @@ namespace MoocDownloader.Shared.Models.Base
             try
             {
                 GoToWebsite();
-                try
+
+                if (!IsLogin)
                 {
-                    if (!IsLogin)
-                        IsLogin = Login();
-                }
-                catch
-                {
-                    IsLogin = false;
-                    result.HasError = true;
+                    Login(stoppingToken);
+                    IsLogin = true;
                 }
 
                 if (IsLogin)
                 {
                     result = ExtractAllVideoUrls(progress, coursePageLink, fromPage, toPage, stoppingToken);
                 }
+                return result;
             }
-            catch
+            catch (Exception ex)
             {
-                result.HasError = true;
+                if (!(ex is TaskCanceledException) && !(ex is OperationCanceledException))
+                    result.HasError = true;
+                return result;
             }
-            return result;
+            finally
+            {
+                Dispose();
+            }
         }
         private void GoToWebsite()
         {
             Navigator.GoToUrl(BaseUrl);
         }
-        protected abstract bool Login();
+        protected abstract void Login(CancellationToken stoppingToken);
         protected virtual CrawlerResult ExtractAllVideoUrls(Action<ProgressValue> progress, string coursePageLink, int? fromPage = null, int? toPage = null, CancellationToken stoppingToken = default)
         {
             var result = new CrawlerResult();
@@ -115,15 +117,15 @@ namespace MoocDownloader.Shared.Models.Base
             try
             {
                 pagesToCrawlQueue = ExtractAllCoursePagesFromCourseListPage(stoppingToken);
-                if (pagesToCrawlQueue == null)
-                    pagesToCrawlQueue = new Queue<string>();
+                pagesToCrawlQueue ??= new Queue<string>();
             }
-            catch
+            catch (Exception ex)
             {
+                if (!(ex is TaskCanceledException) && !(ex is OperationCanceledException))
+                    result.HasError = true;
                 pagesToCrawlQueue = new Queue<string>();
-                result.HasError = true;
             }
-
+            
             int totalCount = pagesToCrawlQueue.Count(x => !string.IsNullOrWhiteSpace(x));
 
             if (toPage.HasValue && fromPage.HasValue)
@@ -152,13 +154,13 @@ namespace MoocDownloader.Shared.Models.Base
                     try
                     {
                         videoLinks = ExtractEachCoursePageVideoUrls(stoppingToken);
-                        if (videoLinks == null)
-                            videoLinks = new List<string>();
+                        videoLinks ??= new List<string>();
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        if (!(ex is TaskCanceledException) && !(ex is OperationCanceledException))
+                            result.HasError = true;
                         videoLinks = new List<string>();
-                        result.HasError = true;
                     }
 
                     foreach (var videoLink in videoLinks)

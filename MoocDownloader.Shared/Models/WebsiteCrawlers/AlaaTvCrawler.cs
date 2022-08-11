@@ -21,32 +21,32 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
 
         }
 
-        protected override bool Login()
+        protected override sealed void Login(CancellationToken stoppingToken)
         {
-            return true;
+            // There is no need to authentication
         }
 
-        protected override Queue<string> ExtractAllCoursePagesFromCourseListPage(CancellationToken stoppingToken)
+        protected sealed override Queue<string> ExtractAllCoursePagesFromCourseListPage(CancellationToken stoppingToken)
         {
-            ScrollToEndOfPage();
+            ScrollToEndOfPage(stoppingToken);
             var pages = Browser.FindElements(By.CssSelector(".a--list1-title a"));
             var pagesQueue = new Queue<string>(pages.Select(x => x.GetAttribute("href")));
             return pagesQueue;
         }
-        private void ScrollToEndOfPage()
+        private void ScrollToEndOfPage(CancellationToken stoppingToken)
         {
             string oldScy, newScy;
             do
             {
                 oldScy = Browser.ExecuteScript("return window.scrollY;").ToString();
                 Browser.ExecuteScript("window.scroll(0, document.body.scrollHeight);");
-                Task.Delay(10).Wait();
+                Task.Delay(10, stoppingToken).Wait();
                 newScy = Browser.ExecuteScript("return window.scrollY;").ToString();
             }
-            while (oldScy != newScy);
+            while (oldScy != newScy && !stoppingToken.IsCancellationRequested);
         }
 
-        protected override List<string> ExtractEachCoursePageVideoUrls(CancellationToken stoppingToken)
+        protected sealed override List<string> ExtractEachCoursePageVideoUrls(CancellationToken stoppingToken)
         {
             var result = new List<string>();
             try

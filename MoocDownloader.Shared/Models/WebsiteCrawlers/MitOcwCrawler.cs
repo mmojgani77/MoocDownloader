@@ -18,17 +18,17 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
 
         }
 
-        protected override Queue<string> ExtractAllCoursePagesFromCourseListPage(CancellationToken stoppingToken)
+        protected override sealed Queue<string> ExtractAllCoursePagesFromCourseListPage(CancellationToken stoppingToken)
         {
             throw new NotImplementedException();
         }
 
-        protected override List<string> ExtractEachCoursePageVideoUrls(CancellationToken stoppingToken)
+        protected override sealed List<string> ExtractEachCoursePageVideoUrls(CancellationToken stoppingToken)
         {
             throw new NotImplementedException();
         }
 
-        protected override bool Login()
+        protected override sealed void Login(CancellationToken stoppingToken)
         {
             throw new NotImplementedException();
         }

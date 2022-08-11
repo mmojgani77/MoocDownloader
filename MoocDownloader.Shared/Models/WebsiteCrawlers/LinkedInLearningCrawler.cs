@@ -21,15 +21,16 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
         {
 
         }
-        protected override Queue<string> ExtractAllCoursePagesFromCourseListPage(CancellationToken stoppingToken)
+        protected override sealed Queue<string> ExtractAllCoursePagesFromCourseListPage(CancellationToken stoppingToken)
         {
-            Waiter.Until(ExpectedConditions.ElementExists(By.CssSelector(".classroom-toc-section")),stoppingToken);
+            Waiter.Until(ExpectedConditions.ElementExists(By.CssSelector(".classroom-toc-section")), stoppingToken);
             var collapsed = Browser.FindElements(By.CssSelector(".classroom-toc-section--collapsed>h2>button"));
 
             foreach (var item in collapsed)
             {
                 Browser.ExecuteScript("arguments[0].click()", item);
-                Task.Delay(50).Wait();
+                Task.Delay(50, stoppingToken).Wait();
+                stoppingToken.ThrowIfCancellationRequested();
             }
 
             var itemsLink = Browser.FindElements(By.CssSelector("a.classroom-toc-item__link"))
@@ -39,7 +40,7 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
             return new Queue<string>(itemsLink);
         }
 
-        protected override List<string> ExtractEachCoursePageVideoUrls(CancellationToken stoppingToken)
+        protected override sealed List<string> ExtractEachCoursePageVideoUrls(CancellationToken stoppingToken)
         {
             var result = new List<string>();
             string browserUrl = Browser.Url;
@@ -71,30 +72,22 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
                     result.Add(src);
                     break;
                 }
-                Task.Delay(100).Wait();
+                Task.Delay(100, stoppingToken).Wait();
             }
             return result;
         }
 
-        protected override bool Login()
+        protected override sealed void Login(CancellationToken stoppingToken)
         {
-            try
-            {
-                var usernameInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("#username")));
-                usernameInput.Click();
-                usernameInput.SendKeys(Username);
-                var passwordInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("#password")));
-                passwordInput.Click();
-                passwordInput.SendKeys(Password);
-                var loginButton = Browser.FindElement(By.CssSelector("button[type=submit]"));
-                loginButton.Click();
-                Waiter.Until(x => x.Url.Contains("/feed", StringComparison.OrdinalIgnoreCase));
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            var usernameInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("#username")), stoppingToken);
+            usernameInput.Click();
+            usernameInput.SendKeys(Username);
+            var passwordInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("#password")), stoppingToken);
+            passwordInput.Click();
+            passwordInput.SendKeys(Password);
+            var loginButton = Browser.FindElement(By.CssSelector("button[type=submit]"));
+            loginButton.Click();
+            Waiter.Until(x => x.Url.Contains("/feed", StringComparison.OrdinalIgnoreCase), stoppingToken);
         }
     }
 }

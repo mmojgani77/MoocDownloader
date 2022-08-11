@@ -32,49 +32,48 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
         {
             var result = new List<string>();
             var resultHashSet = new HashSet<string>();
-            Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector(".loadStep")));
+            Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector(".loadStep")), stoppingToken);
             var loadSteps = Browser.FindElements(By.CssSelector(".loadStep")).ToArray();
             var count = loadSteps.Length / 2;
             loadSteps = loadSteps.Take(count).ToArray();
             foreach (var loadStep in loadSteps)
             {
                 loadStep.Click();
-                string url = null;
+                string url;
                 do
                 {
                     url = null;
-                    var source = Waiter.Until(ExpectedConditions.ElementExists(By.CssSelector("source:first-child")));
+                    var source = Waiter.Until(ExpectedConditions.ElementExists(By.CssSelector("source:first-child")), stoppingToken);
                     url = source.GetAttribute("src");
-                    if(url != null && !resultHashSet.Contains(url))
+                    if (url != null && !resultHashSet.Contains(url))
                         break;
-                    Task.Delay(100);
+                    Task.Delay(50, stoppingToken).Wait();
                 }
-                while (true);
-                result.Add(url);
-                resultHashSet.Add(url);
+                while (!stoppingToken.IsCancellationRequested);
+                
+                if (string.IsNullOrWhiteSpace(url))
+                {
+                    result.Add(url);
+                    resultHashSet.Add(url);
+                }
+
+                if (stoppingToken.IsCancellationRequested)
+                    break;
             }
             return result;
         }
 
-        protected sealed override bool Login()
+        protected sealed override void Login(CancellationToken stoppingToken)
         {
-            try
-            {
-                var usernameInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("#username")));
-                usernameInput.Click();
-                usernameInput.SendKeys(Username);
-                var passwordInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("#password")));
-                passwordInput.Click();
-                passwordInput.SendKeys(Password);
-                var loginButton = Browser.FindElement(By.CssSelector("#formSubmitBtn"));
-                loginButton.Click();
-                Waiter.Until(ExpectedConditions.ElementExists(By.CssSelector("a[href=\"/my-account\"")));
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            var usernameInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("#username")),stoppingToken);
+            usernameInput.Click();
+            usernameInput.SendKeys(Username);
+            var passwordInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("#password")), stoppingToken);
+            passwordInput.Click();
+            passwordInput.SendKeys(Password);
+            var loginButton = Browser.FindElement(By.CssSelector("#formSubmitBtn"));
+            loginButton.Click();
+            Waiter.Until(ExpectedConditions.ElementExists(By.CssSelector("a[href=\"/my-account\"")), stoppingToken);
         }
     }
 }

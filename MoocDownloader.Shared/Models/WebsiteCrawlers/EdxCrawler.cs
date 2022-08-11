@@ -20,9 +20,9 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
 
         }
 
-        protected override Queue<string> ExtractAllCoursePagesFromCourseListPage(CancellationToken stoppingToken)
+        protected override sealed Queue<string> ExtractAllCoursePagesFromCourseListPage(CancellationToken stoppingToken)
         {
-            Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector(".pgn_collapsible")));
+            Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector(".pgn_collapsible")), stoppingToken);
             var sections = Browser.FindElements(By.CssSelector(".pgn_collapsible"));
             var result = new Queue<string>();
             foreach (var section in sections)
@@ -41,30 +41,32 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
                         result.Enqueue(link);
                     }
                 }
-
+                stoppingToken.ThrowIfCancellationRequested();
             }
             return result;
         }
 
-        protected override List<string> ExtractEachCoursePageVideoUrls(CancellationToken stoppingToken)
+        protected override sealed List<string> ExtractEachCoursePageVideoUrls(CancellationToken stoppingToken)
         {
             var result = new List<string>();
-            var navigationTab = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector(".sequence-navigation-tabs")));
+            var navigationTab = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector(".sequence-navigation-tabs")), stoppingToken);
             var tabsButton = navigationTab.FindElements(By.CssSelector("button"));
 
             var framesUrl = new Queue<string>();
 
             foreach (var tabButton in tabsButton)
             {
+                if (stoppingToken.IsCancellationRequested)
+                    break;
+
                 tabButton.Click();
-                var frame = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("#unit-iframe")));
+                var frame = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("#unit-iframe")), stoppingToken);
                 var frameLink = frame?.GetAttribute("src");
                 if (!string.IsNullOrWhiteSpace(frameLink))
                     framesUrl.Enqueue(frameLink);
-
             }
 
-            while (framesUrl.TryDequeue(out string frameLink))
+            while (framesUrl.TryDequeue(out string frameLink) && !stoppingToken.IsCancellationRequested)
             {
                 Navigator.GoToUrl(frameLink);
                 try
@@ -83,23 +85,15 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
 
         }
 
-        protected override bool Login()
+        protected override sealed void Login(CancellationToken stoppingToken)
         {
-            try
-            {
-                var usernameInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("input[name=emailOrUsername]")));
-                usernameInput.SendKeys(Username);
-                var passwordInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("input[name=password]")));
-                passwordInput.SendKeys(Password);
-                var loginButton = Browser.FindElement(By.CssSelector("button[type=submit]"));
-                loginButton.Click();
-                Waiter.Until(ExpectedConditions.ElementExists(By.CssSelector(".nav-item a[href*=dashboard]")));
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            var usernameInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("input[name=emailOrUsername]")),stoppingToken);
+            usernameInput.SendKeys(Username);
+            var passwordInput = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("input[name=password]")), stoppingToken); 
+            passwordInput.SendKeys(Password);
+            var loginButton = Browser.FindElement(By.CssSelector("button[type=submit]"));
+            loginButton.Click();
+            Waiter.Until(ExpectedConditions.ElementExists(By.CssSelector(".nav-item a[href*=dashboard]")), stoppingToken);
         }
     }
 }
