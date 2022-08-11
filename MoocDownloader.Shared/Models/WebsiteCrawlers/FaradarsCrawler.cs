@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace MoocDownloader.Shared.Models.WebsiteCrawlers
 {
@@ -20,14 +21,14 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
         {
 
         }
-        protected sealed override Queue<string> ExtractAllCoursePagesFromCourseListPage()
+        protected sealed override Queue<string> ExtractAllCoursePagesFromCourseListPage(CancellationToken stoppingToken)
         {
             var queue = new Queue<string>();
             queue.Enqueue(Browser.Url);
             return queue;
         }
 
-        protected sealed override List<string> ExtractEachCoursePageVideoUrls()
+        protected sealed override List<string> ExtractEachCoursePageVideoUrls(CancellationToken stoppingToken)
         {
             var result = new List<string>();
             var resultHashSet = new HashSet<string>();

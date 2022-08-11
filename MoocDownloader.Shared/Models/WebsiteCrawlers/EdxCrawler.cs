@@ -20,7 +20,7 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
 
         }
 
-        protected override Queue<string> ExtractAllCoursePagesFromCourseListPage()
+        protected override Queue<string> ExtractAllCoursePagesFromCourseListPage(CancellationToken stoppingToken)
         {
             Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector(".pgn_collapsible")));
             var sections = Browser.FindElements(By.CssSelector(".pgn_collapsible"));
@@ -46,7 +46,7 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
             return result;
         }
 
-        protected override List<string> ExtractEachCoursePageVideoUrls()
+        protected override List<string> ExtractEachCoursePageVideoUrls(CancellationToken stoppingToken)
         {
             var result = new List<string>();
             var navigationTab = Waiter.Until(ExpectedConditions.ElementIsVisible(By.CssSelector(".sequence-navigation-tabs")));

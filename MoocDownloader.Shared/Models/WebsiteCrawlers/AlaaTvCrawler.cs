@@ -26,7 +26,7 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
             return true;
         }
 
-        protected override Queue<string> ExtractAllCoursePagesFromCourseListPage()
+        protected override Queue<string> ExtractAllCoursePagesFromCourseListPage(CancellationToken stoppingToken)
         {
             ScrollToEndOfPage();
             var pages = Browser.FindElements(By.CssSelector(".a--list1-title a"));
@@ -46,7 +46,7 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
             while (oldScy != newScy);
         }
 
-        protected override List<string> ExtractEachCoursePageVideoUrls()
+        protected override List<string> ExtractEachCoursePageVideoUrls(CancellationToken stoppingToken)
         {
             var result = new List<string>();
             try

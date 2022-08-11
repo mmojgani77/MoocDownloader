@@ -45,14 +45,14 @@ namespace MoocDownloader.Shared.Models
             }
         }
 
-        protected override Queue<string> ExtractAllCoursePagesFromCourseListPage()
+        protected override Queue<string> ExtractAllCoursePagesFromCourseListPage(CancellationToken stoppingToken)
         {
             var pages = Browser.FindElements(By.CssSelector(".chapter__unit"));
             var pagesQueue = new Queue<string>(pages.Select(x => x.GetAttribute("href")));
             return pagesQueue;
         }
 
-        protected override List<string> ExtractEachCoursePageVideoUrls()
+        protected override List<string> ExtractEachCoursePageVideoUrls(CancellationToken stoppingToken)
         {
             var result = new List<string>();
             try

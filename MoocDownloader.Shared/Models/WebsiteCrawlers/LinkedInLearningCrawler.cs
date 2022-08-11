@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MoocDownloader.Shared.Models.WebsiteCrawlers
@@ -20,9 +21,9 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
         {
 
         }
-        protected override Queue<string> ExtractAllCoursePagesFromCourseListPage()
+        protected override Queue<string> ExtractAllCoursePagesFromCourseListPage(CancellationToken stoppingToken)
         {
-            Waiter.Until(ExpectedConditions.ElementExists(By.CssSelector(".classroom-toc-section")));
+            Waiter.Until(ExpectedConditions.ElementExists(By.CssSelector(".classroom-toc-section")),stoppingToken);
             var collapsed = Browser.FindElements(By.CssSelector(".classroom-toc-section--collapsed>h2>button"));
 
             foreach (var item in collapsed)
@@ -38,19 +39,20 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
             return new Queue<string>(itemsLink);
         }
 
-        protected override List<string> ExtractEachCoursePageVideoUrls()
+        protected override List<string> ExtractEachCoursePageVideoUrls(CancellationToken stoppingToken)
         {
+            var result = new List<string>();
             string browserUrl = Browser.Url;
             if (browserUrl.Contains("/quiz/", StringComparison.OrdinalIgnoreCase))
-                return new List<string>();
+                return result;
 
             var oldTimeOut = Waiter.Timeout;
             Waiter.Timeout = TimeSpan.FromSeconds(20);
-            while (true)
+            while (!stoppingToken.IsCancellationRequested)
             {
                 try
                 {
-                    var videotagWaited = Waiter.Until(ExpectedConditions.ElementIsVisible(By.TagName("video")));
+                    var videotagWaited = Waiter.Until(ExpectedConditions.ElementIsVisible(By.TagName("video")), stoppingToken);
                     break;
                 }
                 catch
@@ -60,19 +62,17 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
             }
             Waiter.Timeout = oldTimeOut;
             string src;
-            while (true)
+            while (!stoppingToken.IsCancellationRequested)
             {
-                src = null;
                 var videoTag = Browser.FindElement(By.TagName("video"));
                 src = videoTag.GetAttribute("src");
                 if (!string.IsNullOrWhiteSpace(src))
+                {
+                    result.Add(src);
                     break;
+                }
                 Task.Delay(100).Wait();
             }
-            var result = new List<string>()
-            {
-                src
-            };
             return result;
         }
 
@@ -88,7 +88,7 @@ namespace MoocDownloader.Shared.Models.WebsiteCrawlers
                 passwordInput.SendKeys(Password);
                 var loginButton = Browser.FindElement(By.CssSelector("button[type=submit]"));
                 loginButton.Click();
-                Waiter.Until(ExpectedConditions.UrlContains("/feed"));
+                Waiter.Until(x => x.Url.Contains("/feed", StringComparison.OrdinalIgnoreCase));
                 return true;
             }
             catch

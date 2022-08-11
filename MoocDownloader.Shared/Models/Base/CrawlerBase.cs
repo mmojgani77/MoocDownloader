@@ -114,7 +114,7 @@ namespace MoocDownloader.Shared.Models.Base
 
             try
             {
-                pagesToCrawlQueue = ExtractAllCoursePagesFromCourseListPage();
+                pagesToCrawlQueue = ExtractAllCoursePagesFromCourseListPage(stoppingToken);
                 if (pagesToCrawlQueue == null)
                     pagesToCrawlQueue = new Queue<string>();
             }
@@ -151,7 +151,7 @@ namespace MoocDownloader.Shared.Models.Base
                     Navigator.GoToUrl(pageLink);
                     try
                     {
-                        videoLinks = ExtractEachCoursePageVideoUrls();
+                        videoLinks = ExtractEachCoursePageVideoUrls(stoppingToken);
                         if (videoLinks == null)
                             videoLinks = new List<string>();
                     }
@@ -174,8 +174,8 @@ namespace MoocDownloader.Shared.Models.Base
             result.CrawledVideoUrls = videoUrls;
             return result;
         }
-        protected abstract Queue<string> ExtractAllCoursePagesFromCourseListPage();
-        protected abstract List<string> ExtractEachCoursePageVideoUrls();
+        protected abstract Queue<string> ExtractAllCoursePagesFromCourseListPage(CancellationToken stoppingToken);
+        protected abstract List<string> ExtractEachCoursePageVideoUrls(CancellationToken stoppingToken);
 
         public void Dispose()
         {
