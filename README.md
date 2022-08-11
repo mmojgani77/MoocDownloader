@@ -8,6 +8,9 @@ Things to do :
 - [x] Implement Go to class crawler [https://gotoclass.ir](https://gotoclass.ir)
 - [ ] Implement MIT OpenCourseWare crawler [https://ocw.mit.edu/](https://ocw.mit.edu/)
 - [x] Implement Edx crawler [https://www.edx.org/](https://www.edx.org/)
+- [ ] Implement Faradars crawler [https://faradars.org/](https://faradars.org/)
+- [x] Implement Daneshjooyar crawler [https://www.daneshjooyar.com/](https://www.daneshjooyar.com/)
+- [x] Implement Linkedin-Learning crawler [https://www.linkedin.com/learning/](https://www.linkedin.com/learning/)
 - [ ] Implemet SSO feature for sign in
 - [ ] Add ability to crawl all links (not only videos) and save them in different text files depending on the file types (like videos.txt, html.txt, pdf.txt and ...)
 - [x] IDM (Internet download manager) importer tool using cli with sequential number depends on index of crawled link (like 1.mp4, 2.mp4, ...)
